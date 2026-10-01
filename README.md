@@ -4,7 +4,7 @@
 
 # Projeto Lógica — Incompletude, Colagem e Espectro de Limiares de Prova
 
-**Pesquisador:** Euzébio Soares · **Raiz do projeto:** `Desktop\Lógica\` · **Unificação:** 26/09/2026 · **Idioma:** português · **Repositório:** [`ebiossanto/IA-RESEARCH-Lógica`](https://github.com/ebiossanto/IA-RESEARCH-L%C3%B3gica)
+**Pesquisador:** Euzébio Soares · **Raiz do projeto:** `Desktop\Lógica\` · **Unificação:** 26/09/2026 · **Idioma:** português · **Repositório:** [`ebiossanto/IA-RESEARCH-Logica`](https://github.com/ebiossanto/IA-RESEARCH-Logica)
 
 > **Citar este repositório:** use o [CITATION.cff](CITATION.cff) (botão *Cite this repository*) ou a seção [7. Citação](#7-citação) ao pé desta página.
 
@@ -98,7 +98,7 @@ Para citar este repositório, use o arquivo [`CITATION.cff`](CITATION.cff) (o Gi
   author       = {Soares, Euzébio},
   title        = {{IA {RESEARCH} --- Lógica: Incompletude, Falha de Colagem e Espectro de Limiares de Prova}},
   year         = {2026},
-  howpublished = {\url{https://github.com/ebiossanto/IA-RESEARCH-Lógica}},
+  howpublished = {\url{https://github.com/ebiossanto/IA-RESEARCH-Logica}},
   note         = {Repositório de pesquisa, versão de 1 de outubro de 2026}
 }
 ```
