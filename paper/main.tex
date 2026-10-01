@@ -1,0 +1,1752 @@
+% !TeX program = pdflatex
+% ============================================================================
+% Projeto Lógica — artigo (Pilar 4: padrão de publicação Springer/Elsevier)
+% Ambientes teóricos obrigatórios: theorem / lemma / definition / proof.
+% Fórmulas apenas em matemática de bloco (align/equation) — nunca notação de texto.
+% Compilar: pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+%
+% Marco 1 (27/09/2026): texto único dos teoremas locais redigido.
+% Fase de ataque prévia documentada em 02_REVISAO_CRITICA.md §2 (casos de borda:
+% j*=0, B_T=∅, ρ=0, j*=k_Φ, ℓ=∞) + verificação exaustiva (verifica_espectro.py).
+% Busca bibliográfica (Etapa 17) FECHADA em 27/09/2026 — ver 02 §4.2.
+% ============================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+% --- Ambientes teóricos ------------------------------------------------------
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}[theorem]{Proposição}
+\newtheorem{corollary}[theorem]{Corolário}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definição}
+\newtheorem{hypothesis}[theorem]{Hipótese}
+\theoremstyle{remark}
+\newtheorem*{remark}{Observação}
+
+% --- Notação padrão do projeto ----------------------------------------------
+\newcommand{\Prf}{\operatorname{Prf}}
+\newcommand{\Prov}{\operatorname{Prov}}
+\newcommand{\Con}{\operatorname{Con}}
+\newcommand{\Thm}{\operatorname{Thm}}
+\newcommand{\RFN}{\operatorname{RFN}}
+\newcommand{\Fm}{\operatorname{Form}}
+\newcommand{\Out}{\operatorname{Out}}
+\newcommand{\lex}{\mathrm{lex}}
+\newcommand{\N}{\mathbb{N}}
+
+% --- Título ------------------------------------------------------------------
+\title{Espectro de Limiares de Prova e Geradores de Kraj\'{\i}\v{c}ek}
+\author{Euz\'{e}bio Soares\\Pesquisador independente, Brasil}
+\date{Setembro de 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Introduzimos o \emph{espectro de limiares de prova}. A partir do comprimento mínimo
+de prova $\ell_T(\Phi,w)$ das senten\c{c}as de corte de prefixo $\Phi^{w}$, a função
+seletora $J_{T,\Phi}$ induz, para cada f\'{o}rmula, um conjunto finito de limiares de
+transi\c{c}\~{a}o $\mathcal{B}_T(\Phi)$ e um limiar final $\rho_T(\Phi)$; a
+agrega\c{c}\~{a}o por tamanho produz os espectros $\mathcal{S}_T(L)$,
+$\mathcal{C}_T(L)$ e o envelope $R_T(L)$. Provamos os teoremas locais que governam o
+objeto — estabiliza\c{c}\~{a}o com forma exata $c \geq \rho_T(\Phi) \iff
+J_{T,\Phi}(c)=j^{*}_{T}(\Phi)$, caracteriza\c{c}\~{a}o das transi\c{c}\~{o}es
+unitárias e em intervalos, e corol\'{a}rios que comparam dois or\c{c}amentos $b_1
+\leq b_2$ com a sa\'{i}da $\Out$ expl\'{i}cita — todos verificados por enumera\c{c}\~{a}o
+exaustiva ($410.155$ perfis; $7.737.331$ pares). O gerador $g_T^{[b]}$ de
+Kraj\'{\i}\v{c}ek é o campo de aplicação. A busca bibliográfica correspondente
+não encontrou o objeto espectral isolado, o que sustenta a formulação de possíveis
+contribuições originais: o próprio espectro e a geometria de $\mathcal{C}_T(L)$.
+Resultados condicionados (gadget de transferência, grau de Turing de $R_T$) aparecem
+como Nível C. Comparação explícita com Gödel (1936), Parikh (1973), Pudlák (1998)
+e Buss (1994/1999).
+\end{abstract}
+
+% Nível da seção: A (definições) + B (motivação e contribuições, sem teorema novo).
+\section{Introdu\c{c}\~{a}o}
+
+O comprimento mínimo de prova de um teorema é um invariante clássico da teoria da
+demonstração. Gödel mostrou que, em sistemas adequados, esses comprimentos não
+admitem majorante computável ao longo de famílias de teoremas
+\cite{Godel1936}; Parikh estudou limites (e a ausência deles) para comprimentos de
+prova \cite{Parikh1973}, com leituras precisas em \cite{Buss1994,Buss1999}; a
+referência padrão para o conjunto dos fenômenos é o levantamento de Pudlák
+\cite{Pudlak1998}. Numa direção diferente, Krajíček estuda \emph{geradores de
+demonstração}: funções cuja complexidade é medida pela existência de provas curtas
+de suas saídas \cite{Krajicek2025,Krajicek2025generators,Krajicek2024strong}, com
+perguntas abertas registradas em \cite{Krajicek2023ECCC}.
+
+Este artigo pergunta:
+
+\begin{quote}
+\emph{A distribuição dos comprimentos mínimos de prova induz uma geometria
+espectral capaz de controlar a complexidade dos geradores de
+Kraj\'{\i}\v{c}ek?}
+\end{quote}
+
+A cadeia proposta é $\ell_T \to \mathcal{B}_T \to \mathcal{C}_T \to g_T^{[b]}
+\to \tau$. A pergunta metodológica é antiga no projeto (a chamada \emph{falha de
+colagem local--global}): propriedades combinatórias de um objeto finito só
+interessam se forem transportadas para a complexidade.
+
+\medskip
+\noindent\textbf{Contribuições.}
+\begin{enumerate}
+  \item \emph{Ambiente formal autocontido} (Nível A): codificações, sentenças de
+  corte de prefixo, seletor $J$, limiar $\rho$, escada $\mathcal{B}_T$ e espectros
+  $\mathcal{S}_T,\mathcal{C}_T,R_T$, com decisões de codificação fixadas —
+  inclusive $q(\Phi)=|\Phi|+1$ e o registro de um erratum aparente no passo 2 de
+  \cite{Krajicek2025} (detalhes em \texttt{01\_ambiente\_formal\_e\_codificacoes.md},
+  D7).
+  \item \emph{Teoremas locais} (Nível B) na forma \emph{exata}: a estabilização
+  vale como \emph{equivalência} ($\rho$ é limiar exato, não apenas suficiência),
+  com a direção inversa que não constava das fontes; caracterização completa das
+  transições unitárias e em intervalos; observação do tamanho de salto;
+  exemplo canônico; e realizabilidade de escadas finitas.
+  \item \emph{Corolários de comparação} entre dois orçamentos $b_1 \leq b_2$,
+  com a hipótese de injetividade de $\Out$ explicitada, e a condição necessária
+  para diferença infinita — sem qualquer alegação sobre imagens
+  $\operatorname{rng}(g^{[b]})$.
+  \item \emph{O objeto espectral} $\Phi \mapsto \rho_T(\Phi) \mapsto
+  \mathcal{C}_T(L) \mapsto R_T(L)$ como \emph{possível contribuição original}:
+  a busca bibliográfica (sete frentes, inclusive varredura do livro
+  \cite{Krajicek2025generators}) foi encerrada em 27/09/2026 sem colisão de
+  prioridade para esse objeto (detalhes e ressalvas de método em
+  \texttt{02\_REVISAO\_CRITICA.md} §4.2).
+  \item \emph{Resultados condicionados} (Nível C), sempre rotulados como tal:
+  gadget de transferência $\theta \mapsto \Phi_\theta$ e grau de Turing de $R_T$
+  — com as obrigações de prova explicitadas, nunca como teoremas fechados.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{O que este trabalho não estabelece.}
+(i)~não há hierarquia $b_1 < b_2 \Rightarrow g_T^{[b_1]} \prec g_T^{[b_2]}$ (o
+orçamento modifica o próprio gerador); (ii)~$g^{[b_1]}(u) \neq g^{[b_2]}(u)$ não
+implica diferença de imagem; (iii)~não há ponte quantitativa com
+$\tau(g_T^{[b]})$ (Etapa 14); (iv)~a geometria de $\mathcal{C}_T(L)$ está apenas
+definida (Etapas 9--11); (v)~não reivindicamos novidade para a parametrização
+$\log n \to b(n)$ — a prioridade é de \cite{Krajicek2025}; (vi)~a ausência de
+majorante computável para $R_T$ (Nível C) é conteúdo clássico no grau, com
+ancestral no speed-up de \cite{Godel1936}.
+
+\medskip
+\noindent\textbf{Estrutura.} \Cref{sec:ambiente} fixa definições (Nível A);
+\Cref{sec:nucleo} demonstra os teoremas locais (Nível B);
+\Cref{sec:gadget} registra o gadget condicionado (Nível C);
+\Cref{sec:geometria} abre a geometria de $\mathcal{C}_T$;
+\Cref{sec:comparacao} compara com a literatura;
+\Cref{sec:conclusao} conclui.
+
+% ============================================================================
+% Nível A — definições (fonte: docs/espectro-limiares/01_ambiente_formal_e_
+% codificacoes.md, decisões D1–D11; em caso de conflito, vale aquele documento).
+% ============================================================================
+\section{Ambiente formal e codifica\c{c}\~{o}es}\label{sec:ambiente}
+
+\begin{hypothesis}\label{hyp:T}
+Fixe uma teoria $T$ de primeira ordem na linguagem da aritm\'{e}tica, consistente,
+recursivamente axiomatizada, contendo uma teoria aritm\'{e}tica elementar suficiente
+(ex.: $EA$), e dotada de uma rela\c{c}\~{a}o primitiva recursiva de prova
+$\Prf_T(p,x)$ represent\'{a}vel em $T$.
+\end{hypothesis}
+
+% A consistência em hyp:T é usada apenas na leitura semântica (Nível C) e nos
+% blocos 11 do gadget; os teoremas da §3 são sintáticos e valem para qualquer T
+% com Prf bem definida, inclusive inconsistente (01_NUCLEO_DURO §4).
+
+\begin{definition}[Prefixo $u \preceq_{e} v$]\label{def:prefixo}
+Para palavras binárias $u, v$: $u \preceq_{e} v$ significa que $u$ é segmento
+inicial de $v$. Para palavra $w$ e número $x$: $w \preceq_{e} x$ significa
+$w \preceq_{e} \operatorname{bin}(x)$, onde $\operatorname{bin}(x)$ é a
+representação binária canônica de $x$ sem zeros à esquerda
+($\operatorname{bin}(0) = 0$).
+\end{definition}
+
+\begin{definition}[Senten\c{c}as de corte de prefixo]\label{def:fiw}
+Para uma f\'{o}rmula $\Phi(x)$ com uma vari\'{a}vel livre e uma palavra bin\'{a}ria $w$,
+\begin{equation}\label{eq:fiw}
+  \Phi^{w} \;:=\; \exists y\, \forall x > y \,\bigl( \Phi(x) \rightarrow \neg (w \preceq_{e} x) \bigr).
+\end{equation}
+\end{definition}
+
+\begin{definition}[Candidatos]\label{def:candidatos}
+Seja $q(\Phi) := |\Phi|+1$ e $W_\Phi := \{0,1\}^{q(\Phi)} =
+\{w_0 <_{\lex} \cdots < w_{k_\Phi-1}\}$ com $k_\Phi = 2^{q(\Phi)}$.
+Como convenção, $w_{k_\Phi} := \bot$ (sentinela de \emph{todos os candidatos
+demonstráveis}), com $\Out(u,\bot) = \bot$.
+\end{definition}
+
+\begin{definition}[Comprimento m\'{i}nimo de prova]\label{def:ell}
+$\ell_T(\Phi,w) := \min\{ |\pi| : \Prf_T(\pi, \Phi^{w}) \}$, com
+$\ell_T(\Phi,w) := \infty$ se $T \nvdash \Phi^{w}$.
+\end{definition}
+
+\begin{definition}[Seletor]\label{def:J}
+\begin{equation}\label{eq:J}
+  J_{T,\Phi}(c) \;:=\; \min\bigl\{\, j < k_\Phi : \ell_T(\Phi,w_j) > c \,\bigr\},
+  \qquad J_{T,\Phi}(c) := k_\Phi \text{ se o conjunto é vazio}.
+\end{equation}
+$J_{T,\Phi}(c)$ é o \emph{primeiro candidato não reconhecido} no orçamento $c$:
+índices menores têm prova de comprimento $\leq c$.
+\end{definition}
+
+\begin{definition}[Primeiro n\~{a}o demonstr\'{a}vel e limiar final]\label{def:jt-rho}
+\begin{equation}\label{eq:jt}
+  j^{*}_{T}(\Phi) \;:=\; \min\bigl\{\, j : \ell_T(\Phi,w_j) = \infty \,\bigr\}
+  \quad (= k_\Phi \text{ se vazio}),
+\end{equation}
+\begin{equation}\label{eq:rho}
+  \rho_T(\Phi) \;:=\; \max\bigl\{\, \ell_T(\Phi,w_j) : j < j^{*}_{T}(\Phi) \,\bigr\}
+  \qquad (\max \emptyset := 0).
+\end{equation}
+$\rho_T(\Phi)$ é sempre finito: o máximo é tomado apenas sobre coordenadas
+finitas ($j < j^{*}_T(\Phi)$).
+\end{definition}
+
+\begin{definition}[Escada de limiares]\label{def:BT}
+\begin{equation}\label{eq:IT}
+  \mathcal{I}_T(\Phi) := \Bigl\{\, j < j^{*}_{T}(\Phi) :
+  \ell_T(\Phi,w_j) > \max_{i<j} \ell_T(\Phi,w_i) \,\Bigr\}
+  \qquad (\max \emptyset := -1),
+\end{equation}
+\begin{equation}\label{eq:BT}
+  \mathcal{B}_T(\Phi) := \bigl\{\, \ell_T(\Phi,w_j) : j \in \mathcal{I}_T(\Phi) \,\bigr\}.
+\end{equation}
+Os elementos de $\mathcal{B}_T(\Phi)$ são \emph{limiares efetivos de transição}
+(\emph{recordes espectrais}) e formam um conjunto estritamente crescente.
+\end{definition}
+
+\begin{remark}
+Quando $j^{*}_{T}(\Phi) > 0$, o índice $0$ é sempre record
+($\ell_0 \geq 0 > -1$), logo $\mathcal{B}_T(\Phi) \neq \emptyset$ e
+$\rho_T(\Phi) = \max \mathcal{B}_T(\Phi)$. Quando $j^{*}_{T}(\Phi) = 0$,
+$\mathcal{B}_T(\Phi) = \emptyset$ e $\rho_T(\Phi) = 0$. Em particular
+$\rho_T(\Phi) = \max\{ \ell_j : j < j^{*} \} = \max \mathcal{B}_T(\Phi)$
+quando $\mathcal{B}_T(\Phi) \neq \emptyset$: as duas descrições do limiar
+coincidem.
+\end{remark}
+
+\begin{definition}[Perfil]\label{def:perfil}
+$\mathbf{L}_T(\Phi) := (\ell_T(\Phi,w_0), \dots, \ell_T(\Phi,w_{k_\Phi-1}))
+\in (\N \cup \{\infty\})^{k_\Phi}$. O perfil determina completamente a função
+$c \mapsto J_{T,\Phi}(c)$: por definição, $J_{T,\Phi}(c)$ é o primeiro índice
+com $\ell_j > c$. Observação de borda (ataque): \emph{não} vale
+$J_{T,\Phi}(c) = \#\{j : \ell_j \leq c\}$ em geral — índices posteriores ao
+primeiro podem ter $\ell_j \leq c$ (perfil $(2,10,7)$: $J(9) = 1$, embora
+$\ell_2 = 7 \leq 9$).
+\end{definition}
+
+\begin{definition}[Decodifica\c{c}\~{a}o $\Fm_n$ e cauda]\label{def:form}
+Para $n \geq 1$ e $u \in \{0,1\}^n$, $\Fm_n(u) := \Phi$ se existe f\'{o}rmula
+admiss\'{i}vel $\Phi$ com $\Phi \preceq_e u$ e $|\Phi| \leq \lfloor \log n
+\rfloor$; $\Fm_n(u)$ \'{e} indefinida caso contr\'{a}rio. A exist\'{e}ncia, se
+h\'{a}, \'{e} \emph{única} (c\'{o}digo livre de prefixo das f\'{o}rmulas —
+\texttt{01\_ambiente} §2.2, D3--D4). Quando $\Fm_n(u) = \Phi$ \'{e} definida, escrevemos
+$u = \Phi \cdot u_0$ (\emph{cauda} $u_0$, com $|u_0| = n - |\Phi|$).
+\end{definition}
+
+\begin{definition}[Gerador limitado]\label{def:gen}
+Para $u \in \{0,1\}^n$ com $\Fm_n(u) = \Phi$ e orçamento $b : \N \to \N$,
+\begin{equation}\label{eq:gen}
+  g_T^{[b]}(u) \;:=\; \Out\bigl(u,\, w_{J_{T,\Phi}(b(n))}\bigr),
+\end{equation}
+com a convenção $w_{k_\Phi} = \bot$ da \cref{def:candidatos}
+(sa\'{i}da $\bot$ quando todos os candidatos s\~{a}o demonstr\'{a}veis),
+e $\Out_n(u) := 0^{n+1}$ quando $\Fm_n(u)$ \'{e} indefinida. Os resultados
+locais deste artigo dependem apenas de $\Phi, c \mapsto J_{T,\Phi}(c)$ e da
+injetividade (quando exigida) de $\Out$ — não dos detalhes de $\Out$.
+\end{definition}
+
+\begin{definition}[Instância concreta de $\Out$]\label{def:out}
+Para $u$ com $\Fm_n(u) = \Phi$ e candidato $w$ de comprimento $q(\Phi)$,
+\begin{equation}\label{eq:out}
+  \Out_n(u,w) := w \cdot u_0 \in \{0,1\}^{n+1},
+  \qquad
+  \Out_n(u,\bot) := 1^{q(\Phi)} \cdot \overline{u_0},
+\end{equation}
+onde $\overline{u_0}$ é a complementação bit a bit de $u_0$. É esta a
+instância usada nos corolários; ela corresponde à codificação
+\texttt{Form/Tail/Out} fixada em \texttt{01\_ambiente\_formal\_e\_codificacoes.md} §5.1.
+\end{definition}
+
+\begin{definition}[Espectros globais]\label{def:espectros}
+Para $L \in \N$, com $\Phi$ percorrendo as fórmulas admissíveis de tamanho
+$\leq L$:
+\begin{equation}\label{eq:SC}
+  \mathcal{S}_T(L) := \{\rho_T(\Phi) : |\Phi| \leq L\},
+  \qquad
+  \mathcal{C}_T(L) := \bigcup_{|\Phi| \leq L} \mathcal{B}_T(\Phi),
+\end{equation}
+\begin{equation}\label{eq:R}
+  R_T(L) := \max \mathcal{S}_T(L) = \max \mathcal{C}_T(L)
+  \qquad (\text{conjuntos não vazios}).
+\end{equation}
+$\mathcal{S}_T(L)$ guarda apenas o \emph{último} limiar de cada fórmula;
+$\mathcal{C}_T(L)$ guarda \emph{todas} as transições efetivas.
+Em geral $\mathcal{S}_T(L) \neq \mathcal{C}_T(L)$; os máximos coincidem
+(\cref{eq:R}). Versões operacionais: $\mathfrak{F}_n := \{\Phi : \exists u \in
+\{0,1\}^n,\ \Fm_n(u) = \Phi\}$, $\mathcal{S}^{\mathrm{op}}_T(n) :=
+\{\rho_T(\Phi) : \Phi \in \mathfrak{F}_n\}$ e
+$\mathcal{C}^{\mathrm{op}}_T(n) := \bigcup_{\Phi \in \mathfrak{F}_n}
+\mathcal{B}_T(\Phi)$; transporte do orçamento $B_b(L) := b(2^L)$, de modo que a
+comparação correta no espaço das fórmulas é $\mathcal{C}_T(L)$ versus $B_b(L)$.
+\end{definition}
+
+% ============================================================================
+% Nível B — teoremas locais provados e verificados por enumeração exaustiva.
+% Fonte: proofs/Núcleo formal mínimo §§5–7 + 01_NUCLEO_DURO §3.
+% Fase de ataque: 02_REVISAO_CRITICA §2 (bordas: j*=0, B=∅, ρ=0, j*=k, ℓ=∞).
+% ============================================================================
+\section{N\'{u}cleo: defini\c{c}\~{o}es e teoremas locais}\label{sec:nucleo}
+
+\begin{theorem}[Estabiliza\c{c}\~{a}o local]\label{thm:estabilizacao}
+Seja $\Phi$ uma fórmula admissível e $c \in \N$. Se $c \geq \rho_T(\Phi)$, então
+$J_{T,\Phi}(c) = j^{*}_{T}(\Phi)$.
+\end{theorem}
+
+\begin{proof}
+Dois casos.
+
+\emph{Caso 1: $j^{*} := j^{*}_{T}(\Phi) < k_\Phi$.} Para todo $j < j^{*}$ vale
+$\ell_T(\Phi,w_j) \leq \rho_T(\Phi) \leq c$ (pela \cref{eq:rho}), logo
+$\ell_T(\Phi,w_j) \ngtr c$: nenhum índice $j < j^{*}$ pertence ao conjunto da
+\cref{eq:J}. Por outro lado $\ell_T(\Phi,w_{j^{*}}) = \infty > c$, logo $j^{*}$
+pertence ao conjunto e é o seu mínimo. Portanto $J_{T,\Phi}(c) = j^{*}$.
+
+\emph{Caso 2: $j^{*} = k_\Phi$.} Todos os candidatos são demonstráveis e
+$\rho_T(\Phi) = \max_{j < k_\Phi} \ell_T(\Phi,w_j)$. Se $c \geq \rho_T(\Phi)$,
+então $\ell_T(\Phi,w_j) \leq c$ para todo $j < k_\Phi$; o conjunto da
+\cref{eq:J} é vazio e, pela convenção, $J_{T,\Phi}(c) = k_\Phi = j^{*}$.
+\end{proof}
+
+\begin{theorem}[$\rho$ \'{e} limiar exato]\label{thm:limiar-exato}
+Para todo $c \in \N$:
+\begin{equation}\label{eq:iff}
+  J_{T,\Phi}(c) = j^{*}_{T}(\Phi) \qquad\iff\qquad c \geq \rho_T(\Phi).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) é o \cref{thm:estabilizacao}.
+
+($\Leftarrow$) Suponha $c < \rho_T(\Phi)$. Como $c \geq 0$, segue
+$\rho_T(\Phi) > 0$, donde o conjunto $\{ \ell_T(\Phi,w_j) : j < j^{*} \}$ da
+\cref{eq:rho} é não vazio (pois $\max \emptyset = 0$) e existe
+$j_1 < j^{*}$ com $\ell_T(\Phi,w_{j_1}) = \rho_T(\Phi) > c$. Logo $j_1$ pertence
+ao conjunto da \cref{eq:J}, donde $J_{T,\Phi}(c) \leq j_1 < j^{*}$ e, em
+particular, $J_{T,\Phi}(c) \neq j^{*}$.
+\end{proof}
+
+\begin{lemma}[Monotonicidade]\label{lem:monotonicidade}
+Se $c_1 \leq c_2$, então $J_{T,\Phi}(c_1) \leq J_{T,\Phi}(c_2)$.
+\end{lemma}
+
+\begin{proof}
+Se $\ell_j \leq c_1$ então $\ell_j \leq c_2$, donde
+$\{ j : \ell_j > c_2 \} \subseteq \{ j : \ell_j > c_1 \}$. O mínimo de um
+subconjunto é maior ou igual ao mínimo do conjunto que o contém (com a convenção
+$k_\Phi$ para o vazio, que preserva a desigualdade). Logo
+$J_{T,\Phi}(c_1) \leq J_{T,\Phi}(c_2)$.
+\end{proof}
+
+\begin{theorem}[Caracteriza\c{c}\~{a}o das transi\c{c}\~{o}es unit\'{a}rias]\label{thm:transicoes}
+Para todo inteiro $r \geq 1$:
+\begin{equation}\label{eq:62}
+  J_{T,\Phi}(r-1) \neq J_{T,\Phi}(r) \qquad\iff\qquad r \in \mathcal{B}_T(\Phi).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) Suponha $J(r-1) \neq J(r)$. Pela monotonicidade
+(\cref{lem:monotonicidade}), $J(r) > J(r-1)$; seja $j := J(r-1)$. Então
+$\ell_j > r-1$. Afirmamos que $\ell_j \leq r$: caso contrário
+$\ell_j > r$, e $j$ pertenceria também ao conjunto da \cref{eq:J} no orçamento
+$r$; como nenhum $i < j$ pertence ao conjunto no orçamento $r-1$ (definição de
+mínimo) tampouco pertence no orçamento $r$ (pois $\ell_i \leq r-1 \leq r$),
+teríamos $J(r) = j = J(r-1)$, contradição. Como $\ell_j$ é inteiro,
+$r-1 < \ell_j \leq r$ dá $\ell_j = r$. Além disso, para todo $i < j$ vale
+$\ell_i \leq r-1 < r = \ell_j$, e $\ell_j = r < \infty$ implica $j < j^{*}$.
+Logo $j \in \mathcal{I}_T(\Phi)$ e $r = \ell_j \in \mathcal{B}_T(\Phi)$.
+
+($\Leftarrow$) Seja $r = \ell_j$ com $j \in \mathcal{I}_T(\Phi)$
+($j < j^{*}$, portanto $\ell_j = r < \infty$). Por definição de record,
+$\ell_i < r$ para todo $i < j$. No orçamento $r-1$: os $i < j$ satisfazem
+$\ell_i \leq r-1$ (pois $\ell_i$ inteiro $< r$) e $\ell_j = r > r-1$, logo
+$J(r-1) = j$. No orçamento $r$: $\ell_j = r \ngtr r$, e todo $i < j$ tem
+$\ell_i < r$; logo $J(r) \neq j$ (o mínimo, se existir, é estritamente maior
+que $j$, pois nenhum $i \leq j$ permanece no conjunto; se o conjunto é vazio,
+$J(r) = k_\Phi > j$). Em qualquer caso $J(r) \neq J(r-1)$.
+\end{proof}
+
+\begin{theorem}[Caracteriza\c{c}\~{a}o em intervalos]\label{thm:intervalos}
+Para quaisquer $c_1, c_2 \in \N$ com $c_1 \leq c_2$:
+\begin{equation}\label{eq:63}
+  J_{T,\Phi}(c_1) \neq J_{T,\Phi}(c_2)
+  \qquad\iff\qquad
+  \mathcal{B}_T(\Phi) \cap (c_1, c_2] \neq \emptyset.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+($\Leftarrow$) Seja $r \in \mathcal{B}_T(\Phi) \cap (c_1, c_2]$. Então
+$c_1 \leq r-1$ e $r \leq c_2$, donde, pela monotonicidade e pelo
+\cref{thm:transicoes},
+\[
+  J(c_1) \leq J(r-1) \;<\; J(r) \leq J(c_2).
+\]
+Logo $J(c_1) < J(c_2)$.
+
+($\Rightarrow$) Suponha $\mathcal{B}_T(\Phi) \cap (c_1, c_2] = \emptyset$.
+Para cada $r \in (c_1, c_2]$ temos $r \notin \mathcal{B}_T(\Phi)$, logo
+$J(r) = J(r-1)$ pelo \cref{thm:transicoes}. Por indução sobre os
+$finitos$ valores $r$ de $c_1+1$ até $c_2$, $J(c_1) = J(c_2)$.
+\end{proof}
+
+\begin{proposition}[Recordes, limiar e $j^{*}$]\label{prop:t41}
+\begin{enumerate}
+  \item[$(a)$] $j^{*}_{T}(\Phi) = 0 \iff \mathcal{B}_T(\Phi) = \emptyset
+  \text{ e } \rho_T(\Phi) = 0$;
+  \item[$(b)$] se $j^{*}_{T}(\Phi) > 0$, então
+  $\rho_T(\Phi) = \max \mathcal{B}_T(\Phi)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+$(a)$ ($\Rightarrow$) Se $j^{*} = 0$, não há índice $j < j^{*}$; logo
+$\mathcal{I}_T = \mathcal{B}_T = \emptyset$ e, pela \cref{eq:rho},
+$\rho_T = \max \emptyset = 0$. ($\Leftarrow$) Se $\mathcal{B}_T = \emptyset$
+então $\mathcal{I}_T = \emptyset$, ou seja, não há $j < j^{*}$; se
+$j^{*} > 0$, o índice $0$ satisfaria $0 < j^{*}$ e
+$\ell_0 \geq 0 > -1$, isto é, $0 \in \mathcal{I}_T$ — contradição. Logo
+$j^{*} = 0$. (A hipótese $\rho_T = 0$ é consequência, e isoladamente não
+bastaria: o perfil $(0,\infty)$ tem $\rho_T = 0$ com $j^{*} = 1$.)
+
+$(b)$ Se $j^{*} > 0$, então $\mathcal{I}_T \neq \emptyset$ e o máximo sobre
+$j < j^{*}$ é alcançado; como $\{ \ell_j : j < j^{*} \} =
+\{ \ell_j : j \in \mathcal{I}_T \} \cup \{\text{valores não recordes}\}$ e
+todo valor não recorde é $\leq$ de algum record (registro parcial), os dois
+máximos coincidem: $\rho_T = \max \mathcal{B}_T$.
+\end{proof}
+
+\begin{remark}[Tamanho do salto]\label{obs:salto}
+A caracterização do \cref{thm:transicoes} é sobre $\neq$, não sobre o tamanho
+do salto: $|J(r) - J(r-1)|$ pode exceder $1$. Exemplo canônico:
+$\mathbf{L}_T(\Phi) = (2, 10, 7, \infty)$, donde $j^{*} = 3$,
+$\mathcal{B}_T(\Phi) = \{2, 10\}$ e $\rho_T(\Phi) = 10$. Então
+$J(9) = 1$ e $J(10) = 3$: salto $2$ na transição $r = 10$. O valor $7$
+não produz transição, pois o candidato de comprimento $10$ já bloqueia a busca
+antes dele. Na enumeração exaustiva o maior salto observado foi $8$.
+\end{remark}
+
+\begin{proposition}[Realizabilidade combinatória]\label{prop:realizacao}
+Toda escada finita estritamente crescente $\{b_0 < \cdots < b_r\}$ é
+$\mathcal{B}_T$ de algum perfil; a \emph{escada vazia} também (com a convenção
+$\mathcal{B}_T = \emptyset$).
+\end{proposition}
+
+\begin{proof}
+Escada vazia: o perfil $(\infty)$ tem $j^{*} = 0$ e
+$\mathcal{B}_T = \emptyset$. Escada não vazia: tome o perfil
+$(b_0, \dots, b_r, \infty)$. Então $j^{*} = r+1$; para $0 \leq j \leq r$,
+$\ell_j = b_j > b_{j-1} = \max_{i<j} \ell_i$ (com $\max\emptyset = -1$ para
+$j = 0$), logo $\mathcal{I}_T = \{0, \dots, r\}$ e
+$\mathcal{B}_T = \{b_0, \dots, b_r\}$.
+\end{proof}
+
+\begin{remark}[Alcance da realizabilidade]\label{rem:realiz-alcance}
+A \cref{prop:realizacao} \'{e} combinat\'{o}rica: toda escada finita
+estritamente crescente \'{e} $\mathcal{B}_T$ de algum \emph{perfil} abstrato
+$(\ell_0, \dots, \ell_{r}, \infty)$. Ela \emph{n\~{a}o} afirma que toda
+escada ocorra como espectro de comprimentos m\'{i}nimos de prova \emph{reais}
+de f\'{o}rmulas em uma teoria $T$ --- essa vers\~{a}o \'{e} estritamente mais
+forte e n\~{a}o est\'{a} estabelecida aqui (pedido da revisão externa,
+27/09/2026).
+\end{remark}
+
+\medskip
+\noindent Os corolários a seguir comparam dois orçamentos
+$b_1, b_2 : \N \to \N$ com $b_1(n) \leq b_2(n)$. Para uma entrada $u$ de
+tamanho $n$ com $\Fm_n(u) = \Phi$, escrevemos
+$\Out_u(j) := \Out(u, w_j)$.
+
+\begin{lemma}[Injetividade de $\Out$ no candidato — verific\'{a}vel]\label{lem:outinj}
+Para $u$ com $\Fm_n(u) = \Phi$: se $w \neq w'$ são candidatos de $W_\Phi$,
+então $\Out_n(u,w) \neq \Out_n(u,w')$; e
+$\Out_n(u,\bot) \neq \Out_n(u,w)$ para todo $w \in W_\Phi$. Em particular
+$\Out_u$ é injetiva sobre $W_\Phi \cup \{\bot\}$.
+\end{lemma}
+
+\begin{proof}
+Toda sa\'{i}da genu\'{i}na $\Out_n(u,w) = w \cdot u_0$ termina com a mesma
+cauda $u_0$; prefixos de mesmo comprimento distintos d\~{a}o palavras
+distintas, logo $w \neq w' \Rightarrow \Out_n(u,w) \neq \Out_n(u,w')$.
+Para a sa\'{i}da $\bot$: como $\Fm_n(u) = \Phi$, vale
+$|\Phi| \leq \lfloor \log n \rfloor$ (\cref{def:form}), donde
+$|u_0| = n - |\Phi| \geq n - \lfloor \log n \rfloor \geq 1$ para $n \geq 1$
+(correção de revisão externa, 27/09/2026): a cauda contém ao menos um bit e
+$u_0 \neq \overline{u_0}$. A sa\'{i}da $\bot = 1^{q(\Phi)} \cdot
+\overline{u_0}$ s\'{o} poderia colidir com uma genu\'{i}na $w \cdot u_0$ se
+$w = 1^{q(\Phi)}$ (mesmo prefixo) e $u_0 = \overline{u_0}$ --- o que
+$|u_0| \geq 1$ exclui. Logo n\~{a}o colide com nenhuma sa\'{i}da genu\'{i}na. Observação de contraste (ataque): a convenção alternativa
+$\Out_n(u,\bot) := 0^{n+1}$ \emph{colide} quando $u_0 = 0^{n-|\Phi|}$ e
+$w = 0^{q(\Phi)}$, pois $w \cdot u_0 = 0^{n+1}$ — por isso a
+\cref{def:out}.
+\end{proof}
+
+\begin{corollary}[Compara\c{c}\~{a}o local exata entre dois or\c{c}amentos]\label{cor:comparacao}
+Para uma entrada de tamanho $n$ que codifica $\Phi$:
+\begin{align}
+  J_{T,\Phi}(b_1(n)) \neq J_{T,\Phi}(b_2(n))
+  &\iff \mathcal{B}_T(\Phi) \cap \bigl(b_1(n), b_2(n)\bigr] \neq \emptyset,
+  \label{eq:71a}\\
+  g_T^{[b_1]}(u) \neq g_T^{[b_2]}(u)
+  &\iff \mathcal{B}_T(\Phi) \cap \bigl(b_1(n), b_2(n)\bigr] \neq \emptyset,
+  \label{eq:71b}
+\end{align}
+onde \eqref{eq:71b} vale sob a hipótese de $\Out_u$ injetiva sobre os candidatos
+selecionados — hipótese \emph{verificável} (não ad hoc): para a instância
+concreta da \cref{def:out} ela é o \cref{lem:outinj}.
+\end{corollary}
+
+\begin{proof}
+\eqref{eq:71a} é o \cref{thm:intervalos} com $c_1 = b_1(n)$,
+$c_2 = b_2(n)$ (a hipótese $c_1 \leq c_2$ é $b_1 \leq b_2$).
+
+Para \eqref{eq:71b}: ($\Leftarrow$) Se a interseção é não vazia, então por
+\eqref{eq:71a} os candidatos selecionados diferem,
+$w_{J(b_1)} \neq w_{J(b_2)}$, e a injetividade de $\Out_u$ dá saídas diferentes.
+($\Rightarrow$) Se as saídas diferem, os candidatos selecionados diferem
+(mesmo candidato e mesma entrada produzem a mesma saída — sem hipótese de
+injetividade), donde, por \eqref{eq:71a}, a interseção é não vazia.
+\end{proof}
+
+\begin{corollary}[Coincid\^{e}ncia eventual em f\'{o}rmula fixa]\label{cor:coincidencia}
+Se $b_1(n) \to \infty$ e $b_2(n) \to \infty$, então, para toda fórmula fixa
+$\Phi$, existe $N_\Phi$ tal que, para todo $n \geq N_\Phi$ com
+$\Fm_n(u) = \Phi$:
+\begin{equation}\label{eq:72}
+  J_{T,\Phi}(b_1(n)) = J_{T,\Phi}(b_2(n)) = j^{*}_{T}(\Phi)
+  \qquad\text{e}\qquad
+  g_T^{[b_1]}(u) = g_T^{[b_2]}(u).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Como $b_1 \to \infty$ e $\rho_T(\Phi)$ é uma constante finita, existe $N_1$ com
+$b_1(n) \geq \rho_T(\Phi)$ para $n \geq N_1$; analogamente existe $N_2$ para
+$b_2$. Tome $N_\Phi := \max(N_1, N_2)$. Pelo \cref{thm:limiar-exato}, ambos os
+seletores valem $j^{*}_{T}(\Phi)$; como os candidatos selecionados coincidem,
+as saídas coincidem (mesma $\Out_u$), sem exigir injetividade.
+\end{proof}
+
+\begin{corollary}[Condi\c{c}\~{a}o necess\'{a}ria para diferen\c{c}a infinita]\label{cor:diferenca-infinita}
+Suponha que existam infinitos tamanhos $n$ e entradas $u_n$ codificando fórmulas
+$\Phi_n$ tais que $g_T^{[b_1]}(u_n) \neq g_T^{[b_2]}(u_n)$. Então, para infinitos
+$n$:
+\begin{equation}\label{eq:73}
+  \mathcal{B}_T(\Phi_n) \cap \bigl(b_1(n), b_2(n)\bigr] \neq \emptyset.
+\end{equation}
+Em particular, existem $r_n \in \mathcal{B}_T(\Phi_n)$ com
+$b_1(n) < r_n \leq b_2(n)$.
+\end{corollary}
+
+\begin{proof}
+Se as saídas diferem, os candidatos selecionados diferem (mesmo candidato e
+mesma entrada dão a mesma saída); logo, pelo \cref{cor:comparacao}\eqref{eq:71a},
+a interseção é não vazia para cada um desses $n$, e um elemento $r_n$ da
+interseção satisfaz $b_1(n) < r_n \leq b_2(n)$.
+\end{proof}
+
+\begin{remark}[Advert\^{e}ncia sobre imagens]
+O \cref{cor:diferenca-infinita} demonstra diferença de comportamento do
+algoritmo em determinadas entradas. Ele \emph{não} demonstra
+$\operatorname{rng}(g_T^{[b_1]}) \neq \operatorname{rng}(g_T^{[b_2]})$: uma
+saída produzida por uma entrada no primeiro gerador pode ser produzida por outra
+entrada no segundo. Diferença de saída e diferença de imagem são problemas
+distintos.
+\end{remark}
+
+\begin{remark}[Verifica\c{c}\~{a}o computacional]\label{obs:verificacao}
+Todos os resultados acima foram submetidos a enumeração exaustiva
+(\texttt{src/python/verifica\_espectro.py}): $410.155$ perfis
+($k = 1,\dots,6,8$; valores $\{0,1,2,3,\infty\}$) e $7.737.331$ pares
+$(c_1, c_2)$, com os $19$ grupos de teste passando consecutivamente; certificado
+em \texttt{src/python/resultado\_verificacao.txt}. A enumeração cobre
+particularmente os casos de borda $j^{*} = 0$, $\mathcal{B}_T = \emptyset$,
+$\rho = 0$, $j^{*} = k_\Phi$ e perfis com $\ell = \infty$.
+\end{remark}
+
+% ============================================================================
+% Nível C — CONDICIONADO: nada aqui é teorema fechado.
+% Preenchimento na Etapa 7 / Ciclo 2 (obrigações 1–7, 01_ambiente §7.3).
+% Fonte: 01_NUCLEO_DURO §5 (versão bloco, D11) + 01_ambiente §7.
+% ============================================================================
+\section{Gadget de transfer\^{e}ncia e provabilidade}\label{sec:gadget}
+
+% Nível C — CONDICIONADO. Todas as hipóteses ficam visíveis (hyp:P4p, hyp:P7a,
+% correção de T em lem:isolamento). Onde a prova não fecha, a hipótese é
+% nomeada e a lacuna é apontada (Ciclo 2 — 01_ambiente_formal_e_codificacoes.md
+% §7.6, 27/09/2026). A instância Lean do Lema 3 do projeto Gödel entra em
+% rem:polaridade (04_CONTINUIDADE.md §2, item 3).
+
+\begin{definition}[Gadget bloco]\label{def:gadget}
+Para sentença $\theta$ ponha
+\begin{equation}\label{eq:gadget}
+  \Phi_\theta(x) \;:=\; (11 \preceq_{e} x) \;\vee\;
+  \bigl(\neg\theta \wedge (10 \preceq_{e} x)\bigr),
+\end{equation}
+e seja $w^{*} := 1\,0^{\lvert\Phi_\theta\rvert}$ (símbolo $1$ seguido de
+$\lvert\Phi_\theta\rvert$ símbolos $0$), a primeira palavra do \emph{bloco}
+$10$ entre os candidatos de comprimento
+$q(\Phi_\theta) = \lvert\Phi_\theta\rvert + 1$ (\cref{def:candidatos}).
+Os candidatos se repartem em quatro blocos segundo os dois primeiros símbolos:
+$00$, $01$, $10$, $11$ --- a partição exige $q(\Phi_\theta) \geq 2$, garantido
+pela \cref{prop:uniformidade}(ii).
+\end{definition}
+
+\begin{hypothesis}[(P4$'$) --- cotas de tamanho de prova]\label{hyp:P4p}
+Em $T$, as instâncias seguintes de $\preceq_{e}$ têm provas de tamanho
+$O(\lvert w\rvert + \lvert\theta\rvert + 1)$:
+\emph{(i)} se $\lvert w\rvert \geq 2$ e $w$ começa por $0$, então
+$T \vdash \forall x\, \neg(w \preceq_{e} x)$;
+\emph{(ii)} se $w$ começa por $10$, então
+$T \vdash \forall x\bigl(w \preceq_{e} x \rightarrow
+10 \preceq_{e} x \wedge \neg(11 \preceq_{e} x)\bigr)$;
+\emph{(iii)} se $w$ começa por $1$, então
+$T \vdash \forall y\, \exists x > y\, (w \preceq_{e} x)$ (cofinalidade).
+\end{hypothesis}
+
+\begin{remark}
+A definibilidade de $\preceq_{e}$ em $S^{1}_{2}$ (cf.\ \cite{Krajicek2025},
+§2) \emph{não} implica \cref{hyp:P4p}: definibilidade não dá cotas de tamanho
+de prova. Esta é a lacuna nomeada do gadget --- fecha com formalização
+assistida por máquina (pendência; a infraestrutura Lean do projeto Gödel é
+reaproveitável).
+\end{remark}
+
+\begin{hypothesis}[(P7a) --- embutimento linear de $w$]\label{hyp:P7a}
+A linguagem contém dispositivo que embute $w$ em $\Phi^{w}$ com sobrecarga
+$O(\lvert w\rvert)$ no tamanho da fórmula --- ex.: o operador de concatenação
+$\#$ de Buss, com o termo
+$t_{w} := ((1 \mathbin{\#} b_{0}) \mathbin{\#} b_{1}) \mathbin{\#} \cdots
+\mathbin{\#} b_{q-1}$, de tamanho $O(\lvert w\rvert)$ e
+$\operatorname{bin}(t_{w}) = w$. Sem tal dispositivo (numerais em notação
+unária), o custo é $\Theta(2^{\lvert w\rvert})$ e a linearidade da
+\cref{prop:uniformidade}(iii) falha.
+\end{hypothesis}
+
+\begin{lemma}[Cilindros]\label{lem:cilindro}
+Seja $\mathrm{Cyl}(w) := \{ x \in \N : w \preceq_{e} x \}$.
+\begin{enumerate}
+\item[\emph{(i)}] Se $\lvert w\rvert \geq 2$ e $w$ começa por $0$, então
+  $\mathrm{Cyl}(w) = \emptyset$;
+\item[\emph{(ii)}] se $w$ começa por $1$, então $\mathrm{Cyl}(w)$ é cofinal:
+  para todo $y$ existe $x > y$ com $w \preceq_{e} x$;
+\item[\emph{(iii)}] se $w = 10v$, todo $x \in \mathrm{Cyl}(w)$ satisfaz
+  $10 \preceq_{e} x$ e $\neg(11 \preceq_{e} x)$; se $w = 11v$, todo
+  $x \in \mathrm{Cyl}(w)$ satisfaz $11 \preceq_{e} x$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\emph{(i)} $\operatorname{bin}(0) = 0$ tem comprimento
+$1 < \lvert w\rvert$; e $\operatorname{bin}(x)$ de $x \geq 1$ começa por $1$
+(canônica, sem zeros à esquerda). \emph{(ii)} Seja $\langle w \rangle$ o
+número cuja representação binária é $w$ ($\langle w \rangle \geq 1$); dado
+$y$, escolha $k$ com $\langle w \rangle \cdot 2^{k} > y$ e ponha
+$x := \langle w \rangle \cdot 2^{k}$; então
+$\operatorname{bin}(x) = w\,0^{k}$, logo $w \preceq_{e} x$. \emph{(iii)} O
+prefixo de $\operatorname{bin}(x)$ é $w$; se $w$ começa por $10$, esse prefixo
+não começa por $11$ (e vice-versa).
+\end{proof}
+
+\begin{proposition}[Uniformidade e linearidade]\label{prop:uniformidade}
+Seja $\kappa_{0}$ a constante do template da \cref{eq:gadget}. Então:
+\begin{enumerate}
+\item[\emph{(i)}] $\lvert\Phi_\theta\rvert \leq \lvert\theta\rvert + \kappa_{0}$
+  e $\theta \mapsto \Phi_\theta$ é computável em tempo linear --- a
+  linearidade ``(P8)'' está \emph{fechada} nesta versão;
+\item[\emph{(ii)}] $\Phi_\theta$ é admissível (a única variável livre é $x$;
+  $\theta$ é sentença) e $q(\Phi_\theta) = \lvert\Phi_\theta\rvert + 1 \geq 2$;
+\item[\emph{(iii)}] sob \cref{hyp:P7a}, $(\theta, w) \mapsto \Phi_\theta^{w}$
+  é computável em tempo $O(\lvert\theta\rvert + \lvert w\rvert)$ com
+  $\lvert\Phi_\theta^{w}\rvert \leq
+  \lvert\Phi_\theta\rvert + c_{1}\lvert w\rvert + \kappa_{1}$;
+\item[\emph{(iv)}] para as instâncias do gadget
+  ($\lvert w\rvert = q(\Phi_\theta)$):
+  $\lvert\Phi_\theta^{w}\rvert \leq a'\lvert\Phi_\theta\rvert + \lvert w\rvert + b'$
+  com $a' = c_{1}$ e $b' = c_{1} + \kappa_{1} - 1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\emph{(i)} o template \eqref{eq:gadget} copia $\theta$ literalmente após o
+$\neg$ e acrescenta símbolos fixos. \emph{(ii)} $\theta$ sentença não traz
+variáveis livres; os únicos $x$ livres são os de \eqref{eq:gadget}. Toda
+string de fórmula é não vazia, logo $\lvert\Phi_\theta\rvert \geq 1$ e
+$q \geq 2$. \emph{(iii)} a escrita de $\Phi_\theta^{w}$ (\cref{def:fiw})
+embute o termo $t_{w}$ da \cref{hyp:P7a} e copia $\Phi_\theta$; tempo de
+concatenação de strings. \emph{(iv)} substituindo
+$\lvert w\rvert = \lvert\Phi_\theta\rvert + 1$:
+$\lvert\Phi_\theta\rvert + c_{1}(\lvert\Phi_\theta\rvert + 1) + \kappa_{1}
+= (1 + c_{1})\lvert\Phi_\theta\rvert + (c_{1} + \kappa_{1})$; comparando com a
+forma pedida $(a' + 1)\lvert\Phi_\theta\rvert + 1 + b'$, toma-se
+$a' = c_{1}$, $b' = c_{1} + \kappa_{1} - 1$.
+\end{proof}
+
+\begin{theorem}[Blocos: leitura sem\^{a}ntica]\label{thm:blocos-sem}
+Seja $q := q(\Phi_\theta)$ e $w \in \{0,1\}^{q}$.
+\begin{enumerate}
+\item[\emph{(i)}] se $w$ começa por $00$ ou $01$: $\N \models \Phi_\theta^{w}$;
+\item[\emph{(ii)}] se $w$ começa por $10$:
+  $\N \models \Phi_\theta^{w} \iff \N \models \theta$;
+\item[\emph{(iii)}] se $w$ começa por $11$: $\N \not\models \Phi_\theta^{w}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Se $w = 10v$, então em $\mathrm{Cyl}(w)$ valem $10 \preceq_{e} x$ e
+$\neg(11 \preceq_{e} x)$ (\cref{lem:cilindro}(iii)), logo
+$\Phi_\theta(x) \leftrightarrow \neg\theta$ é constante no cilindro.
+
+\emph{(i)} $\mathrm{Cyl}(w) = \emptyset$ (\cref{lem:cilindro}(i)), logo
+$\forall x\, \neg(w \preceq_{e} x)$ vale e a instância $y := 0$ de
+\eqref{eq:fiw} satisfaz $\Phi_\theta^{w}$.
+
+\emph{(ii)} Se $\N \models \theta$: dado $x$, ou $w \not\preceq_{e} x$ e o
+corpo de \eqref{eq:fiw} vale, ou $w \preceq_{e} x$ e então $\Phi_\theta(x)$
+é falso (pela constância acima), de novo valendo o corpo; logo $y := 0$
+instancia \eqref{eq:fiw} e $\N \models \Phi_\theta^{w}$. Se
+$\N \models \neg\theta$: dado $y$, o \cref{lem:cilindro}(ii) dá $x > y$ com
+$w \preceq_{e} x$; nesse $x$ vale $\Phi_\theta(x)$ (pois $10 \preceq_{e} x$
+e $\neg\theta$). Pela equivalência lógica
+$\neg\exists y\forall x>y(\Phi \rightarrow \neg P) \leftrightarrow
+\forall y\exists x>y(\Phi \wedge P)$, segue $\N \not\models \Phi_\theta^{w}$.
+
+\emph{(iii)} dado $y$, o \cref{lem:cilindro}(ii) dá $x > y$ com
+$w \preceq_{e} x$; por \cref{lem:cilindro}(iii), $11 \preceq_{e} x$, e o
+primeiro disjuntivo de \eqref{eq:gadget} dá $\Phi_\theta(x)$. Logo
+$\forall y\exists x>y\bigl(\Phi_\theta(x) \wedge w \preceq_{e} x\bigr)$, isto
+é, $\N \not\models \Phi_\theta^{w}$.
+\end{proof}
+
+\begin{theorem}[Blocos: leitura sint\'{a}tica, condicionada a
+\cref{hyp:P4p}]\label{thm:blocos-sin}
+Sob \cref{hyp:P4p}:
+\begin{enumerate}
+\item[\emph{(i)}] se $w$ começa por $00$ ou $01$:
+  $T \vdash \Phi_\theta^{w}$ com prova de tamanho
+  $\leq a(\lvert\theta\rvert + q) + c$;
+\item[\emph{(ii)}] se $w$ começa por $10$:
+  $T \vdash (\Phi_\theta^{w} \leftrightarrow \theta)$ com prova de tamanho
+  $\leq a(\lvert\theta\rvert + q) + c$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{(i)} por \cref{hyp:P4p}(i), $T \vdash \forall x\,\neg(w \preceq_{e} x)$
+com prova de tamanho $O(q)$; por lógica proposicional,
+$T \vdash \forall x\bigl(\Phi_\theta(x) \rightarrow \neg(w \preceq_{e} x)\bigr)$
+e, instanciando $y := 0$ em \eqref{eq:fiw}, $T \vdash \Phi_\theta^{w}$. Tamanho
+total $O(q)$.
+
+\emph{(ii)} \emph{Direção $\theta \rightarrow \Phi_\theta^{w}$:} sob a
+hipótese $\theta$, o segundo disjuntivo de \eqref{eq:gadget} é falso; e de
+$w \preceq_{e} x$ segue $\neg(11 \preceq_{e} x)$ por \cref{hyp:P4p}(ii),
+donde $\Phi_\theta(x)$ é falso e o corpo de \eqref{eq:fiw} vale (para $x$ com
+$w \not\preceq_{e} x$, vale direto). \emph{Direção
+$\neg\theta \rightarrow \neg\Phi_\theta^{w}$:} negando \eqref{eq:fiw},
+$\neg\Phi_\theta^{w} \leftrightarrow \forall y\exists x>y\bigl(\Phi_\theta(x)
+\wedge w \preceq_{e} x\bigr)$; dado $y$, a \cref{hyp:P4p}(iii) dá $x > y$ com
+$w \preceq_{e} x$, e para esse $x$ valem $10 \preceq_{e} x$
+(\cref{lem:cilindro}(iii)) e a hipótese $\neg\theta$, donde $\Phi_\theta(x)$.
+Em ambas as direções o tamanho é $O(q) \leq a(\lvert\theta\rvert + q) + c$.
+\end{proof}
+
+\begin{remark}[Procedimento de deci\c{s}\~{a}o e graus --- Nível C]\label{rem:graus}
+Dada $\theta$: calcule $\Phi_\theta$, pergunte $R_T(\lvert\Phi_\theta\rvert)$
+e busque provas de $\Phi_\theta^{w^{*}}$ de comprimento
+$\leq R_T(\lvert\Phi_\theta\rvert)$. A busca é finita, e a redução
+$\mathrm{Thm}(T) \leq_{T} R_T$ (com $\mathrm{Thm}(T)$ = conjunto dos teoremas
+de $T$) é correta usando apenas as existências da
+\cref{thm:blocos-sin} (qualquer tamanho) e
+$\rho_T(\Phi_\theta) \in \mathcal{S}_T(\lvert\Phi_\theta\rvert)$ ---
+\emph{sem} correção de $T$ e \emph{sem} linearidade: \emph{completude}, porque
+se $T \vdash \theta$ então $T \vdash \Phi_\theta^{w^{*}}$ e
+índice$(w^{*}) < j^{*}$, donde
+$\ell_T(\Phi_\theta, w^{*}) \leq \rho_T(\Phi_\theta)
+\leq R_T(\lvert\Phi_\theta\rvert)$; \emph{soundness}, porque se
+$T \nvdash \theta$ então $T \nvdash \Phi_\theta^{w^{*}}$
+(\cref{lem:isolamento}(ii)) e nada há para achar. A direção inversa é
+enumeração finita com oráculo. Sob a correção de $T$ e a completude
+$\Sigma_{1}$ de $\mathrm{Thm}(T)$ para $T \in \{S^{1}_{2}, \mathrm{PA}\}$,
+fecha-se a cadeia $\mathrm{Thm}(T) \equiv_{T} R_T \equiv_{T} \emptyset'$
+--- \textbf{Nível C, com as hipóteses visíveis}: nenhuma dessas equivalências
+é afirmada sem elas, e nenhuma é apresentada como novidade.
+\end{remark}
+
+\begin{lemma}[Corre\c{c}\~{a}o de $T$ isolada]\label{lem:isolamento}
+Suponha $T$ correta ($T \vdash \varphi \Rightarrow \N \models \varphi$).
+\begin{enumerate}
+\item[\emph{(i)}] se $w$ começa por $11$, então $T \nvdash \Phi_\theta^{w}$;
+\item[\emph{(ii)}] para $w$ do bloco $10$ vale \emph{sintaticamente}
+  $T \nvdash \theta \Rightarrow T \nvdash \Phi_\theta^{w}$ --- sem correção;
+\item[\emph{(iii)}] a contrapositiva em \emph{(i)} é o \emph{único} uso de
+  correção de $T$ nesta seção.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\emph{(i)} pelo \cref{thm:blocos-sem}(iii), $\N \not\models \Phi_\theta^{w}$;
+contrapositiva da correção. \emph{(ii)} se $T \vdash \Phi_\theta^{w}$, então
+de $T \vdash (\Phi_\theta^{w} \rightarrow \theta)$
+(\cref{thm:blocos-sin}(ii)) se seguiria $T \vdash \theta$. \emph{(iii)}
+verificação de uso: as \cref{prop:uniformidade} e
+\cref{thm:blocos-sin} são dedutivas a partir de \cref{hyp:P4p}; o
+\cref{thm:blocos-sem} é aritmética ordinária sobre $\N$; o caso
+$T \nvdash \theta$ do \cref{thm:jstar} e o procedimento da
+\cref{rem:graus} usam apenas \emph{(ii)}. O único ponto onde a semântica de
+$T$ entra é a não-provabilidade do bloco $11$ no caso $T \vdash \theta$
+(\cref{thm:jstar}(i)).
+\end{proof}
+
+\begin{theorem}[Localiza\c{c}\~{a}o de $j^{*}$ e escala de $\rho_T$]\label{thm:jstar}
+Seja $s_T(\theta) := \min\{ \lvert\pi\rvert : \Prf_T(\pi, \theta) \}$ o
+comprimento mínimo de prova de $\theta$ (finito quando $T \vdash \theta$).
+Sob \cref{hyp:P4p} e a correção de $T$, com $q := q(\Phi_\theta)$:
+\begin{enumerate}
+\item[\emph{(i)}] se $T \vdash \theta$:
+  $j^{*}_{T}(\Phi_\theta) = 3 \cdot 2^{q-2}$ (a primeira palavra do bloco
+  $11$) e
+\begin{equation}\label{eq:escala-rho}
+  s_T(\theta) - a(\lvert\theta\rvert + q) - c
+  \;\leq\; \rho_T(\Phi_\theta)
+  \;\leq\; s_T(\theta) + a(\lvert\theta\rvert + q) + c;
+\end{equation}
+\item[\emph{(ii)}] se $T \nvdash \theta$: $j^{*}_{T}(\Phi_\theta) = 2^{q-1}$,
+  o índice de $w^{*}$, e
+  $\rho_T(\Phi_\theta) \leq a(\lvert\theta\rvert + q) + c$. (A correção de $T$
+  \emph{não} é usada em \emph{(ii)}.)
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{(i)} Os blocos $00/01$ são prováveis (\cref{thm:blocos-sin}(i)) e o
+bloco $10$ é provável sob $T \vdash \theta$ (\cref{thm:blocos-sin}(ii),
+direção $\theta \rightarrow \Phi_\theta^{w}$); o bloco $11$ é não-provável
+(\cref{lem:isolamento}(i)). Logo o primeiro candidato não demonstrável é a
+primeira palavra $11\,0^{q-2}$, cujo índice --- ordem lexicográfica coincide
+com a ordem numérica binária para mesmo comprimento ---
+é $3 \cdot 2^{q-2}$.
+
+\emph{Superior:} para $j < j^{*}$, ou $w_j$ está nos blocos $00/01$ e
+$\ell_T(\Phi_\theta, w_j) \leq a(\lvert\theta\rvert+q)+c$
+(\cref{thm:blocos-sin}(i)), ou $w_j$ está no bloco $10$ e concatenando uma
+prova de $\theta$ (tamanho $s_T(\theta)$) à derivação
+$\theta \rightarrow \Phi_\theta^{w_j}$ (tamanho
+$\leq a(\lvert\theta\rvert+q)+c$) obtém-se
+$\ell_T(\Phi_\theta, w_j) \leq s_T(\theta) + a(\lvert\theta\rvert+q)+c$.
+O máximo herda a cota.
+
+\emph{Inferior:} $w^{*}$ é provável (bloco $10$, hipótese $T \vdash \theta$),
+logo índice$(w^{*}) < j^{*}$ e
+$\rho_T(\Phi_\theta) \geq \ell_T(\Phi_\theta, w^{*})$. De uma prova $\pi$ de
+$\Phi_\theta^{w^{*}}$ extrai-se uma de $\theta$ concatenando $\pi$ com a
+derivação $\Phi_\theta^{w^{*}} \rightarrow \theta$
+(\cref{thm:blocos-sin}(ii)), logo
+$s_T(\theta) \leq \lvert\pi\rvert + a(\lvert\theta\rvert+q)+c$, isto é,
+$\ell_T(\Phi_\theta, w^{*}) \geq s_T(\theta) - a(\lvert\theta\rvert+q) - c$.
+
+\emph{(ii)} Por \cref{lem:isolamento}(ii), nenhum candidato do bloco $10$ é
+provável; os blocos $00/01$ continuam prováveis (\cref{thm:blocos-sin}(i)).
+Logo $j^{*}$ é o índice da primeira palavra do bloco $10$: essa palavra é
+$10\,0^{q-2} = 1\,0^{q-1} = w^{*}$, de índice $2^{q-1}$. E $\rho_T(\Phi_\theta)$
+só alcança os blocos $00/01$, todos com prova
+$\leq a(\lvert\theta\rvert+q)+c$ (\cref{thm:blocos-sin}(i)).
+\end{proof}
+
+\begin{definition}[Espectro $\Sigma^{b}_{1}$]\label{def:espectro-sigma}
+$\mathcal{S}^{\Sigma}_T(L) := \{ \rho_T(\Phi) : \Phi$ admissível,
+$\Phi \in \Sigma^{b}_{1}$, $\lvert\Phi\rvert \leq L \}$ e
+$R^{\Sigma}_T(L) := \max \mathcal{S}^{\Sigma}_T(L)$ --- a versão
+$\Sigma^{b}_{1}$ de \eqref{eq:SC}--\eqref{eq:R}.
+\end{definition}
+
+\begin{remark}[Classe sintática do gadget --- parcial]\label{rem:classe}
+Se $\theta \in \Pi^{b}_{1}$ literalmente, então $\Phi_\theta \in \Sigma^{b}_{1}$:
+pondo $\theta = \forall z \leq t\, \beta(z)$ com $\beta \in \Delta_{0}$,
+\begin{equation}\label{eq:classe}
+  \Phi_\theta(x) \;\leftrightarrow\; \exists z \leq t{+}1\,
+  \Bigl[ \bigl(z = t{+}1 \wedge (11 \preceq_{e} x)\bigr)
+  \;\vee\; \bigl(z \leq t \wedge \neg\beta(z) \wedge (10 \preceq_{e} x)\bigr)
+  \Bigr],
+\end{equation}
+e os átomos $10 \preceq_{e} x$, $11 \preceq_{e} x$ são $\Delta_{0}$ (testes
+dos dígitos de $\operatorname{bin}(x)$ nas posições fixas $0,1$; casamento
+sobre $x \bmod 4$). Até equivalência em $S^{1}_{2}$ a recíproca também vale:
+fixando $x_{0} := 2$ (vale $10 \preceq_{e} 2$ e $\neg(11 \preceq_{e} 2)$),
+$\Phi_\theta(2) \leftrightarrow \neg\theta$, logo
+$\Phi_\theta \in \Sigma^{b}_{1} \Rightarrow \theta \in \Pi^{b}_{1}$
+(ambos no sentido \emph{representável}). Para $\theta$ arbitrário, porém, o
+pertencimento que importa em $R^{\Sigma}_T$ é o \emph{literal} ($\rho_T$ é
+calculado sobre a fórmula literal --- fórmulas equivalentes têm comprimentos
+de prova diferentes), e aí a transferência
+$\mathrm{Thm}(T) \leq_{T} R^{\Sigma}_T$ fica sólida para
+$\theta \in \Pi^{b}_{1}$; o caso geral se reduz a saber se
+$\mathrm{Thm}(T) \cap \Pi^{b}_{1}$ é $\emptyset'$-duro para
+$T \in \{S^{1}_{2}, \mathrm{PA}\}$ --- \textbf{questão aberta registrada},
+não resolvida aqui. A alternativa registrada é o gadget ``timeout'', com
+$\Phi_\theta \in \Delta^{b}_{1}$ para todo $\theta$, pagando obrigações de
+simulação de máquina ainda em aberto.\ Cf.\ \cite{Krajicek2025}.
+\end{remark}
+
+\begin{theorem}[Escala quantitativa $M_T$]\label{thm:escala}
+Seja
+$M_T(m) := \max\{ s_T(\theta) : T \vdash \theta,\ \lvert\theta\rvert \leq m \}$
+(máximo sobre conjunto finito de sentenças). Sob \cref{hyp:P4p} e
+\cref{hyp:P7a} --- \emph{sem} correção de $T$ ---, com $a_{8}, b_{8}$ da
+\cref{prop:uniformidade}(i):
+\begin{equation}\label{eq:escala}
+  M_T(m) \;\leq\; R_T(a_{8}\, m + b_{8}) \;+\; a(1 + a_{8})\,m
+  \;+\; a(b_{8}+1) + c .
+\end{equation}
+Para sentenças $\theta \in \Pi^{b}_{1}$, o mesmo vale com $R^{\Sigma}_T$ no
+lugar de $R_T$.
+\end{theorem}
+
+\begin{proof}
+Seja $\theta$ com $T \vdash \theta$ e $\lvert\theta\rvert \leq m$. A
+desigualdade inferior de \eqref{eq:escala-rho} --- cuja única premissa é que
+$w^{*}$ é provável, obtida de $T \vdash \theta$ e
+\cref{thm:blocos-sin}(ii), \emph{sem} correção --- dá
+$s_T(\theta) \leq \rho_T(\Phi_\theta) + a(\lvert\theta\rvert+q)+c$. Como
+$\rho_T(\Phi_\theta) \in \mathcal{S}_T(\lvert\Phi_\theta\rvert)$ e $R_T$ é não
+decrescente (\eqref{eq:R}), segue
+$\rho_T(\Phi_\theta) \leq R_T(\lvert\Phi_\theta\rvert)
+\leq R_T(a_{8} m + b_{8})$ pela \cref{prop:uniformidade}(i). Além disso
+$q = \lvert\Phi_\theta\rvert + 1 \leq a_{8} m + b_{8} + 1$. Logo
+\begin{align*}
+  s_T(\theta) &\leq R_T(a_{8} m + b_{8})
+    + a\bigl(m + a_{8} m + b_{8} + 1\bigr) + c \\
+              &= R_T(a_{8} m + b_{8}) + a(1+a_{8})\,m + a(b_{8}+1) + c .
+\end{align*}
+A cota é uniforme em $\theta$; o conjunto dos $\theta$'s é finito, logo vale
+para o máximo. A versão $\Sigma^{b}_{1}$ usa
+$\rho_T(\Phi_\theta) \in \mathcal{S}^{\Sigma}_T(\lvert\Phi_\theta\rvert)$,
+válido pois $\theta \in \Pi^{b}_{1}$ implica $\Phi_\theta \in \Sigma^{b}_{1}$
+(\cref{rem:classe}).
+\end{proof}
+
+\begin{remark}[Forma da escala]\label{rem:escala-forma}
+A \cref{eq:escala} tem um \emph{slack} linear $a(1+a_{8})m$, proveniente do
+custo da equivalência $\Phi_\theta^{w^{*}} \leftrightarrow \theta$ na extração
+$s_T(\theta) \leq \rho_T(\Phi_\theta) + a(\lvert\theta\rvert+q)+c$. A forma sem
+slack, $M_T(m) \leq R_T(a \cdot m + b) + c$, exigiria
+$R_T(L) \geq \Omega(L)$ --- não estabelecido. Registra-se a divergência com a
+forma anunciada no material de trabalho
+(\texttt{03\_PRONTOS\_E\_A\_FAZER.md} item 12).
+\end{remark}
+
+\begin{remark}[Polaridade e o projeto G\"{o}del]\label{rem:polaridade}
+O gadget de bloco tem polaridade \emph{positiva}: no bloco $10$,
+$\Phi_\theta^{w^{*}} \leftrightarrow \theta$, logo limiar alto corresponde a
+$T \vdash \theta$. O gadget ``padding'' do projeto Gödel --- verificação em
+Lean do seu Lema 3, $\Phi^{w^{*}} \leftrightarrow \mathrm{Con}(T)$ --- tem
+polaridade \emph{invertida} ($\Phi^{w^{*}} \leftrightarrow T \nvdash \theta$).
+As duas linhas são complementares; a comparação detalhada está em
+\texttt{04\_CONTINUIDADE.md} §2.
+\end{remark}
+
+% ============================================================================
+% Nível A (definições) / potencial maior de originalidade — Etapas 9–11.
+% Fonte: 06_GEOMETRIA_CT.md §§9.1–9.3 (convenções D-geo-1..4 visíveis).
+% Fase de ataque: 06 §9.2 (G.1–G.10); barreira Σ1 em lem:barreira.
+% ============================================================================
+\section{Geometria do espectro $\mathcal{C}_{T}(L)$}\label{sec:geometria}
+
+A \cref{def:espectros} define $\mathcal{C}_T(L)$ como um conjunto de
+inteiros; ``geometria'' exige estrutura. Esta seção equipa
+$\mathcal{C}_T(L)$ com contagem, lacunas, densidade, multiplicidade,
+massa total e medida, prova as propriedades elementares e registra a
+barreira de computabilidade. Tudo aqui é elementoar (níveis A/B) e nada
+altera os teoremas locais da \cref{sec:nucleo}. As separações entre
+teorias exigem sistemas concretos e permanecem abertas
+(\cref{rem:abertas-geom}; \texttt{06\_GEOMETRIA\_CT.md} §9.3, P-1).
+
+\begin{definition}[Invariantes da geometria]\label{def:geometria}
+Seja $\mathcal{C}_T(L) = \{c_1 < \cdots < c_m\}$ (não vazio pelos
+conjuntos de \eqref{eq:R}) e $\Phi$ admissível de tamanho $\leq L$:
+\begin{align}
+  N_T(L) &:= |\mathcal{C}_T(L)|, \qquad
+  \Delta_T(L) := \max_{i < m} (c_{i+1} - c_i),
+  \label{eq:invariantes}\\
+  D_T(L,R) &:= \frac{|\mathcal{C}_T(L) \cap [0,R]|}{R+1}, \qquad
+  A_T(L,r) := |\{c \in \mathcal{C}_T(L) : c \leq r\}|, \nonumber\\
+  K_T(\Phi) &:= |\mathcal{B}_T(\Phi)|, \qquad
+  m_T(L,r) := \bigl|\{(\Phi,j) : |\Phi| \leq L,\ j \in \mathcal{I}_T(\Phi),\
+  \ell_T(\Phi,w_j) = r\}\bigr|,
+  \label{eq:multiplicidade}\\
+  Z_L &:= \sum_{|\Phi| \leq L} K_T(\Phi) = \sum_{r} m_T(L,r),
+  \label{eq:ZL}\\
+  \mu_{T,L} &:= \frac{1}{Z_L} \sum_{r} m_T(L,r)\, \delta_r
+  \qquad (\text{definida para } Z_L > 0),
+  \label{eq:mu}
+\end{align}
+onde $\delta_r$ tem massa unitária em $r$. Para $b_1 \leq b_2$ funções
+de orçamento, com o transporte $B_b(L) := b(2^L)$ da
+\cref{def:espectros} (arredondamento por piso: convenção D-geo-3), a
+\emph{atividade espectral} de um intervalo de orçamento é
+\begin{equation}\label{eq:atividade}
+  A_T(L; b_1, b_2) := |\mathcal{C}_T(L) \cap (B_{b_1}(L), B_{b_2}(L)]|,
+  \qquad
+  \widetilde{A}_T(L; b_1, b_2) := \!\!\sum_{r \in (B_{b_1}(L),\, B_{b_2}(L)]}\!\! m_T(L,r).
+\end{equation}
+Diferenças locais e de imagem (definir \emph{não} é afirmar relação
+entre elas — \cref{rem:abertas-geom}):
+\begin{equation}\label{eq:difs}
+  D_{b_1,b_2}(n) := \{u \in \{0,1\}^n : g_T^{[b_1]}(u) \neq g_T^{[b_2]}(u)\},
+  \quad
+  R_b(n) := \operatorname{rng}(g_T^{[b]}) \cap \{0,1\}^{n+1},
+  \quad
+  E_{b_1,b_2}(n) := R_{b_1}(n) \,\triangle\, R_{b_2}(n).
+\end{equation}
+\emph{Convenções explícitas} (totalidade; \texttt{06\_GEOMETRIA\_CT.md}
+§9.1): $\Delta_T(L) := 0$ para $m \leq 1$ (D-geo-1); a fórmula de $m_T$
+restringe a fórmulas admissíveis, único domínio de $\mathcal{I}_T$
+(D-geo-2). O \emph{perfil de instabilidade} $c \mapsto
+\min\{j : \ell_j > c\}$ do material de organização \emph{coincide} com
+o seletor $J_{T,\Phi}$ da \cref{eq:J}, com a mesma sentinela $k_\Phi$:
+a convenção D-geo-4 é justamente a do núcleo.
+\end{definition}
+
+% --- Alinhamento $b(n)$ vs. $B_b(L)$ (06_GEOMETRIA_CT.md §9.6.4) ----------
+\begin{lemma}[Transporte do orçamento: sanducho do piso]\label{lem:transporte}
+Seja $b : \N \to \N$ não decrescente e $L_n := \lfloor \log n \rfloor$
+($\log$ na base $2$, \texttt{01\_ambiente} D5). Com o transporte
+$B_b(L) := b(2^L)$ da \cref{def:espectros}, vale, para todo $n \geq 1$,
+\begin{equation}\label{eq:transporte}
+  B_b(L_n) \;\leq\; b(n) \;\leq\; B_b(L_n + 1).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Do piso, $2^{L_n} \leq n < 2^{L_n+1}$; aplicando a $b$ não decrescente
+a estas duas desigualdades, $b(2^{L_n}) \leq b(n) \leq b(2^{L_n+1})$, e
+$b(2^{L}) = B_b(L)$.
+\end{proof}
+
+\begin{corollary}[Exatidão do transporte na escala logarítmica]\label{cor:escala-log}
+Se $b(n) = \beta(\lfloor \log n \rfloor)$ com $\beta$ não decrescente
+--- em particular $b \equiv \beta$ constante,
+$b(n) = \lfloor \log n \rfloor$ e $b(n) = \lfloor \log n \rfloor + k$
+---, então $b(n) = B_b(L_n)$ para todo $n \geq 1$. Logo, para $b_1
+\leq b_2$ nesta forma, a janela transportada de \eqref{eq:atividade}
+coincide com a janela verdadeira $(b_1(n), b_2(n)]$ de
+\eqref{eq:cobertura}, e
+\begin{equation}\label{eq:escala-log}
+  A_T(L_n; b_1, b_2)
+  \;=\; \bigl|\mathcal{C}_T(L_n) \cap (b_1(n),\, b_2(n)]\bigr| .
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+$B_b(L_n) = b(2^{L_n}) = \beta(\lfloor \log 2^{L_n} \rfloor)
+= \beta(L_n)$ e $b(n) = \beta(\lfloor \log n \rfloor) = \beta(L_n)$,
+pois $\lfloor \log 2^{L_n} \rfloor = L_n = \lfloor \log n \rfloor$.
+As duas janelas são iguais, logo \eqref{eq:atividade} é
+\eqref{eq:escala-log}.
+\end{proof}
+
+\begin{lemma}[Monotonicidades --- e a que não há]\label{lem:lattice}
+Para $L \leq L'$ vale $\mathcal{C}_T(L) \subseteq \mathcal{C}_T(L')$;
+logo $N_T$, $R_T$, $Z_L$, $A_T(L,\cdot)$ e $A_T(L;b_1,b_2)$ são não
+decrescentes em $L$, e $D_T(L,\cdot)$ é não decrescente no segundo
+argumento. Para $\Delta_T$ \emph{não} há monotonicidade garantida (nem
+em $L$, nem internamente).
+\end{lemma}
+
+\begin{proof}
+A inclusão é a de uniões crescentes em \eqref{eq:SC}; as demais são
+consequências de $|\cdot|$ e $\max$ sobre conjuntos crescentes. Para
+$\Delta_T$, os dois sentidos já existem no nível de conjuntos livres:
+$\{0,10\} \mapsto \{0,5,10\}$ dá $\Delta: 10 \mapsto 5$, enquanto
+$\{0,10\} \mapsto \{0,10,30\}$ dá $10 \mapsto 20$. Se tais cadeias são
+realizáveis como $\mathcal{C}_T(L) \subseteq \mathcal{C}_T(L')$ é
+pergunta aberta de realizabilidade, logo a afirmação correta é ``não
+garantida'', e não ``é decrescente'' (nem ``é crescente'').
+\end{proof}
+
+\begin{lemma}[A multiplicidade determina o suporte]\label{lem:mult-suporte}
+$\mathcal{C}_T(L) = \{r : m_T(L,r) \geq 1\}$. Em particular
+$N_T(L) \leq Z_L$, com igualdade se, e somente se, toda multiplicidade
+é $1$.
+\end{lemma}
+
+\begin{proof}
+$m_T(L,r) \geq 1$ $\iff$ existe $\Phi$ com $|\Phi| \leq L$ e recorde
+$j \in \mathcal{I}_T(\Phi)$ com $\ell_T(\Phi,w_j) = r$ $\iff$ $r \in
+\bigcup_{|\Phi| \leq L} \mathcal{B}_T(\Phi)$, que é a definição de
+$\mathcal{C}_T(L)$. A contagem de valores distintos é menor ou igual à
+soma das massas (somas finitas: cada $\mathcal{I}_T(\Phi) \subseteq
+\{0,\dots,k_\Phi-1\}$), com igualdade sss todas as massas de suporte
+são $1$.
+\end{proof}
+
+\begin{lemma}[Massa total e medida]\label{lem:massa}
+$Z_L$ é finita e $Z_L = \sum_{|\Phi| \leq L} K_T(\Phi)$. Sob a
+hipótese \cref{hyp:P4p} (Ciclo 2), $Z_L \geq 1$ para todo $L$ no
+menor tamanho admissível com $q(\Phi) \geq 2$; logo $\mu_{T,L}$ é
+probabilidade com $\operatorname{supp}(\mu_{T,L}) = \mathcal{C}_T(L)$.
+Sem \cref{hyp:P4p}, $Z_L > 0$ é \emph{hipótese}, não teorema.
+\end{lemma}
+
+\begin{proof}
+A finitude e a troca de soma são imediatas ($K_T(\Phi) \leq k_\Phi <
+\infty$). Para a positividade: com $w_0 = 0^{q(\Phi)}$ e $q(\Phi)
+\geq 2$, $\mathrm{Cyl}(w_0) = \emptyset$, logo $\Phi^{w_0}$ é verdadeira
+e $T \vdash \Phi^{w_0}$ por \cref{hyp:P4p}(i) (raciocínio de C2.2 em
+\texttt{01\_ambiente} §7.6, válido para qualquer $\Phi$ admissível);
+logo $j^{*} \geq 1$ e, sendo $0$ sempre recorde, $0 \in
+\mathcal{I}_T(\Phi)$, donde $K_T(\Phi) \geq 1$ e $Z_L \geq 1$.
+Probabilidade: $\sum_r m_T(L,r)/Z_L = Z_L/Z_L = 1$; suporte segue da
+\cref{lem:mult-suporte}.
+\end{proof}
+
+\begin{proposition}[Limites triviais --- sandbox]\label{prop:limites}
+Para todo $\Phi$ admissível:
+$K_T(\Phi) \leq \min(2^{|\Phi|+1},\, \rho_T(\Phi)+1)$. Para todo $L$:
+\begin{equation}\label{eq:limites}
+  N_T(L) \leq Z_L \leq \min\bigl(2^{2L+2},\ \mathfrak{a}_L \cdot (R_T(L)+1)\bigr),
+  \qquad
+  \Delta_T(L) \leq R_T(L),
+  \qquad
+  A_T(L,r) \leq N_T(L),
+\end{equation}
+com $\mathfrak{a}_L \leq 2^{L+1}$ o número de fórmulas admissíveis de
+tamanho $\leq L$.
+\end{proposition}
+
+\begin{proof}
+$\mathcal{B}_T(\Phi)$ é estritamente crescente em inteiros não
+negativos, logo $K_T(\Phi) \leq \rho_T(\Phi) + 1$; e
+$\mathcal{I}_T(\Phi) \subseteq \{0,\dots,k_\Phi-1\}$ com
+$k_\Phi = 2^{|\Phi|+1}$, logo o outro ramo do mínimo. Somando:
+$\sum_{|\Phi| \leq L} \min(2^{|\Phi|+1}, \rho_T(\Phi)+1) \leq
+\min(\sum 2^{|\Phi|+1},\, \sum (\rho_T(\Phi)+1))$, e $\sum
+2^{|\Phi|+1} \leq 2^{L+1} \cdot 2^{L+1} = 2^{2L+2}$ (há no máximo
+$2^{L+1}$ cadeias de comprimento $\leq L$), enquanto
+$\rho_T(\Phi) \leq R_T(L)$ dá $\mathfrak{a}_L (R_T(L)+1)$; a
+primeira desigualdade é a \cref{lem:mult-suporte}. Para $\Delta_T$:
+$\Delta_T \leq c_m - c_1 \leq c_m = R_T(L)$ (D-geo-1 cobre $m \leq
+1$). Inclusões de conjuntos dão $A_T \leq N_T$.
+\end{proof}
+
+\begin{remark}[Para que serve o sandbox]
+Os limites de \eqref{eq:limites} são triviais de propósito: toda
+simulação que reporte $N_T(L) > 2^{2L+2}$, $A_T(L,r) > N_T(L)$ ou
+$\Delta_T(L) > R_T(L)$ está errada. Eles não capturam o comportamento
+real --- para isso servem as questões abertas abaixo.
+\end{remark}
+
+\begin{lemma}[Identidades de contagem]\label{lem:identidades}
+Para $R \geq 0$: $D_T(L,R) = A_T(L,R)/(R+1)$. Para $b_1 \leq b_2$:
+$A_T(L;b_1,b_2) = A_T(L, B_{b_2}(L)) - A_T(L, B_{b_1}(L))$.
+\end{lemma}
+
+\begin{proof}
+Primeira: substituição na definição de $D_T$ e divisão. Segunda:
+para inteiros, $(B_{b_1}(L), B_{b_2}(L)] \cap \mathcal{C} =
+([0, B_{b_2}(L)] \setminus [0, B_{b_1}(L)]) \cap \mathcal{C}$, e
+subtração de cardinalidades de conjuntos finitos.
+\end{proof}
+
+\begin{lemma}[Atividade, multiplicidade e medida]\label{lem:atividade}
+\begin{enumerate}
+\item[(i)] $\widetilde{A}_T(L;b_1,b_2) = \sum_{r \in (B_{b_1}(L), B_{b_2}(L)]} m_T(L,r)$;
+\item[(ii)] $A_T(L;b_1,b_2) \leq \widetilde{A}_T(L;b_1,b_2) \leq Z_L$
+  --- a primeira com igualdade se, e somente se, toda multiplicidade
+  no intervalo é $1$;
+\item[(iii)] $\mu_{T,L}\bigl((B_{b_1}(L), B_{b_2}(L)]\bigr) =
+  \widetilde{A}_T(L;b_1,b_2)/Z_L$ (para $Z_L > 0$): a atividade
+  normalizada é um intervalo de probabilidade da medida espectral.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) é a definição. (ii) No suporte vale $m_T(L,r) \geq 1$
+(\cref{lem:mult-suporte}), logo a soma é maior ou igual ao número de
+valores distintos; a soma total é $Z_L$. (iii) segue da definição de
+$\mu_{T,L}$ sobre o suporte.
+\end{proof}
+
+\begin{lemma}[Barreira de computabilidade]\label{lem:barreira}
+Para $T$ enumerável e suficientemente forte (ex.: $S^1_2$, $\mathrm{PA}$):
+\begin{enumerate}
+\item[(i)] a relação ``$r \in \mathcal{C}_T(L)$'' é $\Sigma_1$
+  (enumerável);
+\item[(ii)] calcular \emph{exatamente} $N_T(L)$, $m_T(L,r)$,
+  $\Delta_T(L)$ ou $\mu_{T,L}$ exige decidir afirmações $T \nvdash
+  \varphi$ --- não-decidível, pois $\mathrm{Thm}(T)$ é
+  $\Sigma_1$-completo;
+\item[(iii)] portanto simulação algébrica não produz $j^{*}_T(\Phi)$:
+  o que se computa num limite de busca $c$ é $J_{T,\Phi}(c)$, com
+  $J_{T,\Phi}(c) \leq j^{*}_T(\Phi)$ (pelo \cref{thm:limiar-exato}:
+  ou $c \geq \rho_T(\Phi)$ e $J = j^{*}$, ou $c < \rho_T(\Phi)$ e $J$
+  fica estritamente abaixo), com igualdade se, e somente se, $c \geq
+  \rho_T(\Phi)$. Todo experimento registra $(c, J_{T,\Phi}(c), \Phi)$,
+  e \emph{dado observado $\neq$ teorema}.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) $r \in \mathcal{C}_T(L)$ $\iff$ existem $\Phi$ de tamanho $\leq L$
+e $j < k_\Phi$ tal que [$\forall i \leq j$: $T \vdash \Phi^{w_i}$],
+$\ell_j = r$ e $j$ é recorde. A parte $\forall i \leq j$ é conjunção
+finita de $\Sigma_1$; comprimento e recorde são decidíveis \emph{dadas}
+as provas (busca limitada), logo o conjunto dos pares $(\Phi,j)$
+válidos é enumerável. (ii) Determinar $N_T(L) = |\{r : m_T \geq 1\}$
+exige classificar cada par candidato a recorde quanto a $j < j^{*}$,
+o que inclui $T \nvdash \Phi^{w_{j'}}$ para algum $j'$ --- metade
+$\Pi_1$; um algoritmo geral para $T \nvdash \varphi$ decidiria
+$\mathrm{Thm}(T)$, não-decidível pela completude $\Sigma_1$. (iii)
+consequência de (ii) e do \cref{thm:limiar-exato}.
+\end{proof}
+
+\begin{remark}[O que não fecha aqui --- e as proibições]\label{rem:abertas-geom}
+\emph{(P-1)} Separar $T_1, T_2$ com $R_{T_1} \asymp R_{T_2}$ mas $N_T$
+ou $\Delta_T$ radicalmente distintos exige teorias \emph{concretas}
+(Etapa 10; \texttt{06} §9.3); pelo \cref{lem:barreira} isso não sai de
+simulação. \emph{(P-2)} Densidade positiva, crescimento e leis de
+$A_T(L;b_1,b_2)$ seguem abertas --- exceto a pergunta 4 (``$A_T > 0$
+implica desacordo dos geradores?''), resolvida na
+\cref{sec:consequencia}. \emph{(P-3)} Os teoremas-alvo da Etapa 11
+(caracterização de $g^{[b_1]} \neq g^{[b_2]}$ e limite inferior de
+$|D_{b_1,b_2}(n)|$ via $A_T$) estão resolvidos na
+\cref{sec:consequencia} para \emph{saídas}
+(\cref{thm:cobertura,cor:atividade}). \emph{(P-4, lista permanente)}
+Não se afirma: hierarquia $b_1 < b_2 \Rightarrow \prec$; diferença de
+$\operatorname{rng}(g^{[b]})$; ponte com $\tau$; novidade de $b(n)$;
+qualquer ``no-majorant''; qualquer grau de $R_T$ (só nível C, com
+hipóteses visíveis); e diferença de \emph{imagens} a partir de
+diferença de saídas --- a exceção de 27/09/2026 cobre somente a
+diferença de \emph{saídas}, já provada. \emph{(P-5)} $Z_L > 0$ sob
+\cref{hyp:P4p}; $\Delta_T$ total pela D-geo-1; $m_T$ total pela
+D-geo-2; $J$ total pela \cref{eq:J} (D-geo-4 resolvida).
+\end{remark}
+
+% ============================================================================
+% Nível B — consequência global exata do espectro (ciclo "Consequência global").
+% Fonte: CONTINUIDADE_ESPECTRO_CONSEQUENCIA_GLOBAL.md (Teoremas A–F) e
+% desenv..md (identidade de cobertura), revisados em 27/09/2026:
+% F_n = {|Φ| ≤ L_n} PROVADO (lem:cilindros-n); r ≥ 1 no nº de regimes;
+% não-revisitância via lem:monotonicidade; leitura probabilística incondicional.
+% ============================================================================
+\section{Consequência global: o espectro mede o desacordo dos geradores}\label{sec:consequencia}
+
+A \cref{cor:comparacao} é \emph{por entrada}: compara dois orçamentos
+numa única $u$. Esta seção eleva a comparação a todo o domínio
+$\{0,1\}^n$ e mostra que o espectro é \emph{exatamente} a massa de
+desacordo dos geradores: $\mathcal{C}_T(L)$ deixa de ser apenas uma
+definição e vira o suporte da derivada discreta da família
+$\{g_T^{[c]}\}_c$ em distância de Hamming normalizada
+(\cref{cor:suporte-dinamico}). Os teoremas são de nível B: seguem de
+\eqref{eq:71b} e da \cref{lem:cilindros-n} com hipóteses visíveis
+(código livre de prefixo; instância concreta \cref{def:out};
+\cref{lem:outinj}). Nada aqui toca range, $\tau$ ou hardness
+(\cref{rem:abertas-global}). Fonte: os documentos de trabalho
+\texttt{CONTINUIDADE\_ESPECTRO\_CONSEQUENCIA\_GLOBAL.md} (Teoremas
+A--F) e \texttt{desenv..md}, revisados e corrigidos em 27/09/2026.
+
+\begin{definition}[Cilindros de tamanho $n$]\label{def:cilindros}
+Para $\Phi$ admissível com $\Phi \in \mathfrak{F}_n$, o cilindro é
+$U_n(\Phi) := \{u \in \{0,1\}^n : \Fm_n(u) = \Phi\}$; a massa de
+$\Phi$ é $2^{-|\Phi|}$. Escrevemos $L_n := \lfloor \log n \rfloor$
+(mesma expressão da \cref{def:form}).
+\end{definition}
+
+\begin{lemma}[Cilindros operacionais]\label{lem:cilindros-n}
+Seja $L_n := \lfloor \log n \rfloor$. Então:
+\begin{enumerate}
+\item[(i)] $\mathfrak{F}_n = \{\Phi \text{ admissível} : |\Phi| \leq L_n\}$;
+\item[(ii)] $\{U_n(\Phi)\}_{\Phi \in \mathfrak{F}_n}$ particiona
+  $\{u : \Fm_n(u)$ definida$\}$ e $|U_n(\Phi)| = 2^{n - |\Phi|}$;
+\item[(iii)] $\sum_{\Phi \in \mathfrak{F}_n} 2^{-|\Phi|} \leq 1$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) $\subseteq$: é a condição $|\Phi| \leq \lfloor \log n \rfloor$ da
+\cref{def:form}. $\supseteq$: se $\Phi$ é admissível com
+$|\Phi| \leq \lfloor \log n \rfloor$, tome $u := \Phi \cdot
+0^{\,n - |\Phi|}$ (não negativo pois $\lfloor \log n \rfloor \leq n$);
+vale $\Phi \preceq_e u$ e, pelo código livre de prefixo, a fórmula é
+única, logo $\Fm_n(u) = \Phi$ e $\Phi \in \mathfrak{F}_n$.
+(ii) $\Fm_n(u) = \Phi$ \emph{quer dizer} que a codificação de $\Phi$ é
+prefixo de $u$, donde $U_n(\Phi) = \{\Phi \cdot v : v \in
+\{0,1\}^{n - |\Phi|}\}$, com $2^{n - |\Phi|}$ elementos; a
+disjunção para $\Phi \neq \Phi'$ é do código livre de prefixo.
+(iii) $\sum_{\Phi} 2^{-|\Phi|} = 2^{-n} \bigl|\bigcup_\Phi
+U_n(\Phi)\bigr| \leq 1$ por disjunção.
+\end{proof}
+
+\begin{definition}[Discrepância, intensidade, cobertura e regimes]\label{def:cobertura}
+Para $b_1 \leq b_2$ funções de orçamento e $c \in \N$ constante
+(escrevemos $g_T^{[c]}$ para a função constante $b \equiv c$):
+\begin{align}
+  \mathrm{D}_n(b_1,b_2) &:= 2^{-n}\, \bigl|\bigl\{u \in \{0,1\}^n :
+  g_T^{[b_1]}(u) \neq g_T^{[b_2]}(u)\bigr\}\bigr|,
+  \label{eq:Dn}\\
+  \lambda_{T,n}(r) &:= \sum_{\Phi \in \mathfrak{F}_n} 2^{-|\Phi|}\,
+  \mathbf{1}_{\,r \in \mathcal{B}_T(\Phi)}, \qquad
+  \Gamma_{T,n}(I) := \sum_{\Phi \in \mathfrak{F}_n} 2^{-|\Phi|}\,
+  \mathbf{1}_{\,\mathcal{B}_T(\Phi) \cap I \neq \emptyset},
+  \label{eq:lambdagamma}\\
+  \mathcal{G}_n &:= \{g_T^{[c]} \text{ restrito a } \{0,1\}^n :
+  c \in \N\}.
+  \label{eq:Gn}
+\end{align}
+Aqui $I$ é um intervalo de inteiros; $\lambda_{T,n}(r)$ é a
+\emph{intensidade} da transição $r$ e $\Gamma_{T,n}(I)$ a
+\emph{cobertura} de $I$. Pela \cref{lem:cilindros-n}(iii) ambas são
+$\leq 1$. $\lambda$ é aditiva em $r$; $\Gamma$ \emph{não} é aditiva
+nos intervalos (uma mesma fórmula pode conter várias transições):
+intensidade e cobertura são invariantes distintos.
+\end{definition}
+
+\begin{theorem}[Identidade de cobertura espectral]\label{thm:cobertura}
+Para quaisquer funções de orçamento $b_1 \leq b_2$:
+\begin{equation}\label{eq:cobertura}
+  \mathrm{D}_n(b_1,b_2)
+  \;=\; \Gamma_{T,n}\bigl(\bigl(b_1(n), b_2(n)\bigr]\bigr)
+  \;=\!\! \sum_{\substack{\Phi \in \mathfrak{F}_n\\
+      \mathcal{B}_T(\Phi) \cap (b_1(n), b_2(n)] \neq \emptyset}}\!\! 2^{-|\Phi|}.
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Particione $\{0,1\}^n$ pela \cref{lem:cilindros-n}(ii). Se $\Fm_n(u)$
+é indefinida, $g_T^{[b]}(u) = 0^{n+1}$ é independente de $b$
+(\cref{def:gen}), e $u$ não contribui. Se $u \in U_n(\Phi)$, o
+\cref{cor:comparacao}\eqref{eq:71b} dá
+$g_T^{[b_1]}(u) \neq g_T^{[b_2]}(u)$ $\iff$
+$\mathcal{B}_T(\Phi) \cap (b_1(n), b_2(n)] \neq \emptyset$ --- condição
+que depende só de $\Phi$ e de $n$, não da cauda $u_0$. Logo ou todo o
+cilindro contribui, ou nenhum; contribuindo, são $2^{n - |\Phi|}$
+entradas (\cref{lem:cilindros-n}(ii)). Somando sobre os cilindros
+disjuntos e dividindo por $2^n$:
+$\mathrm{D}_n = \sum 2^{n - |\Phi|} / 2^n = \sum 2^{-|\Phi|}$.
+\end{proof}
+
+\begin{corollary}[Massa de Hamming de uma transição]\label{cor:intensidade}
+Para todo inteiro $r \geq 1$, com orçamentos constantes:
+\begin{equation}\label{eq:intensidade}
+  \mathrm{D}_n(r-1, r) \;=\; \lambda_{T,n}(r).
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Os inteiros em $(r-1, r]$ formam o conjunto $\{r\}$, logo a hipótese
+da \cref{thm:cobertura} se reduz a $r \in \mathcal{B}_T(\Phi)$.
+\end{proof}
+
+\begin{corollary}[Caraterização dinâmica de $\mathcal{C}_T$]\label{cor:suporte-dinamico}
+Para todo inteiro $r \geq 1$:
+\begin{equation}\label{eq:suporte-dinamico}
+  r \in \mathcal{C}_T(L_n)
+  \qquad\iff\qquad
+  \mathrm{D}_n(r-1, r) > 0 .
+\end{equation}
+Em particular, com $R_T(L_n) \geq 1$,
+$\mathcal{C}_T(L_n) \cap [1,\infty) = \operatorname{supp}(\lambda_{T,n})$
+e $R_T(L_n) = \max \operatorname{supp}(\lambda_{T,n})$.
+\end{corollary}
+
+\begin{proof}
+$\lambda_{T,n}(r) > 0$ $\iff$ existe $\Phi \in \mathfrak{F}_n$ com
+$r \in \mathcal{B}_T(\Phi)$; pela \cref{lem:cilindros-n}(i),
+$\mathfrak{F}_n$ é exatamente o domínio de $\mathcal{C}_T(L_n)$ em
+\eqref{eq:SC}, logo isso equivale a $r \in \mathcal{C}_T(L_n)$. A
+equivalência com a desigualdade é \eqref{eq:intensidade}.
+\end{proof}
+
+\begin{corollary}[Atividade espectral e desacordo --- Etapa 11]\label{cor:atividade}
+Sejam $\beta_1 < \beta_2$ inteiros e $b_i \equiv \beta_i$ constantes.
+Então
+\begin{equation}\label{eq:atividade-disagree}
+  \mathrm{D}_n(\beta_1, \beta_2) > 0
+  \quad\iff\quad
+  A_T(L_n; b_1, b_2) > 0,
+  \qquad
+  \mathrm{D}_n(\beta_1, \beta_2)
+  \;\geq\; \frac{A_T(L_n; b_1, b_2)}{(\beta_2 - \beta_1)\, 2^{L_n}} .
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Escreva $I := (\beta_1, \beta_2]$, com $|I| = \beta_2 - \beta_1$
+elementos, e conte os pares $P := \{(\Phi, r) : \Phi \in
+\mathfrak{F}_n,\ r \in \mathcal{B}_T(\Phi) \cap I\}$. Por um lado,
+$|P| = \sum_{r \in I \cap \mathcal{C}_T(L_n)} m_T(L_n, r) \geq
+A_T(L_n; b_1, b_2)$ (\cref{lem:mult-suporte}); por outro, $|P| \leq
+|\{\Phi : \mathcal{B}_T(\Phi) \cap I \neq \emptyset\}| \cdot |I|$.
+Logo o número de fórmulas contribuintes é $\geq A_T(L_n; b_1, b_2) /
+(\beta_2 - \beta_1)$, e cada uma pesa $2^{-|\Phi|} \geq 2^{-L_n}$
+(pela \cref{lem:cilindros-n}(i)); substituição em \eqref{eq:cobertura}
+dá o limite inferior. A equivalência positiva é \eqref{eq:cobertura}
+notando que $A_T(L_n; b_1, b_2) > 0$ $\iff$ alguma
+$\mathcal{B}_T(\Phi)$, $\Phi \in \mathfrak{F}_n$, corta $I$.
+\end{proof}
+
+\noindent
+Este corolário fecha os dois teoremas-alvo da Etapa 11
+(\texttt{06} §9.3, P-3): (a)~a caracterização de $g_T^{[b_1]} \neq
+g_T^{[b_2]}$ é o cruzamento de intervalo de \eqref{eq:71b}, agora
+somada sobre todos os cilindros; (b)~o limite inferior de
+$|D_{b_1,b_2}(n)| = \mathrm{D}_n \cdot 2^n$ em função de $A_T$. Fecha
+também a pergunta 4 de P-2 --- para \emph{saídas}; imagens permanecem
+proibidas (\cref{rem:abertas-geom}).
+
+\begin{corollary}[Atividade espectral com orçamentos variáveis]\label{cor:atividade-var}
+Sejam $b_1 \leq b_2$ ponto a ponto, com largura
+$w_n := b_2(n) - b_1(n) \geq 1$ (hipótese visível; para $w_n = 0$ a
+forma não se aplica), e seja
+\begin{equation}\label{eq:atividade-var}
+  A^{\mathrm{var}}_T(L; b_1, b_2)
+  := \bigl|\mathcal{C}_T(L) \cap (b_1(n),\, b_2(n)]\bigr|
+\end{equation}
+a atividade avaliada na \emph{janela verdadeira} de \eqref{eq:cobertura}.
+Então
+\begin{equation}\label{eq:atividade-var-limite}
+  \mathrm{D}_n(b_1, b_2)
+  \;=\; \Gamma_{T,n}\bigl((b_1(n), b_2(n)]\bigr)
+  \;\geq\; \frac{A^{\mathrm{var}}_T(L_n; b_1, b_2)}{w_n \, 2^{L_n}} .
+\end{equation}
+Para orçamentos constantes, e mais geralmente para toda escala
+logarítmica (\cref{cor:escala-log}), $A^{\mathrm{var}}_T = A_T(L_n;
+b_1, b_2)$ e isto se reduz a \eqref{eq:atividade-disagree}.
+\end{corollary}
+
+\begin{proof}
+A igualdade é \eqref{eq:cobertura}. Seja $W := (b_1(n), b_2(n)]$
+($w_n$ inteiros) e $S := \{\Phi \in \mathfrak{F}_n : \mathcal{B}_T(\Phi)
+\cap W \neq \emptyset\}$. Então
+$\Gamma_{T,n}(W) = \sum_{\Phi \in S} 2^{-|\Phi|} \geq |S| \, 2^{-L_n}$
+(pois $|\Phi| \leq L_n$ pela \cref{lem:cilindros-n}(i)). Por outro
+lado, cada $r \in \mathcal{C}_T(L_n) \cap W$ está em
+$\mathcal{B}_T(\Phi)$ para algum $\Phi \in \mathfrak{F}_n$
+(\cref{lem:cilindros-n}(i) e \eqref{eq:SC}), logo esse $\Phi \in S$ e
+\[
+  A^{\mathrm{var}}_T(L_n; b_1, b_2)
+  = \Bigl|\bigcup_{\Phi \in S} \bigl(\mathcal{B}_T(\Phi) \cap W\bigr)\Bigr|
+  \;\leq\; \sum_{\Phi \in S} \bigl|\mathcal{B}_T(\Phi) \cap W\bigr|
+  \;\leq\; |S| \, w_n .
+\]
+Logo $|S| \geq A^{\mathrm{var}}_T / w_n$ e a substituição dá o limite
+inferior.
+\end{proof}
+
+\noindent
+Duas notas. (a)~\emph{Janela verdadeira}: fora da escala logarítmica o
+transporte $B_b$ de \eqref{eq:atividade} não coincide com a janela
+verdadeira --- pela \cref{lem:transporte}, se $b_i$ não decrescentes,
+$(b_1(n), b_2(n)] \subseteq (B_{b_1}(L_n),\, B_{b_2}(L_n+1)]$, ou seja
+maiorantes via $A_T$ transportado valem com a oitava à direita, e
+minorantes exigem $A^{\mathrm{var}}_T$ na janela verdadeira
+(ex.: $b_1(n) = n$, $b_2(n) = 2n$, $n = 5$: $(4,8]$ contra $(5,10]$).
+(b)~\emph{Permissão}: nada aqui afirma hierarquia $b_1 < b_2 \Rightarrow
+\prec$ --- usa-se apenas $w_n \geq 1$ e \eqref{eq:cobertura}
+(\cref{rem:abertas-geom}, P-4).
+
+\begin{theorem}[Estabilização global exata]\label{thm:estab-global}
+Seja $R^{\mathrm{glob}}_n := \min\{c \in \N : \forall c' \geq c\
+\forall u \in \{0,1\}^n,\ g_T^{[c']}(u) = g_T^{[c]}(u)\}$, com
+orçamentos constantes. Então
+\begin{equation}\label{eq:estab-global}
+  R^{\mathrm{glob}}_n \;=\; R_T(L_n).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+($\leq$) Seja $c \geq R_T(L_n)$ e $c' \geq c$. Todo
+$r \in \mathcal{C}_T(L_n)$ satisfaz $r \leq R_T(L_n) \leq c$, donde
+$\mathcal{B}_T(\Phi) \cap (c, c'] = \emptyset$ para todo
+$\Phi \in \mathfrak{F}_n$, e \eqref{eq:cobertura} dá
+$\mathrm{D}_n(c, c') = 0$: os geradores coincidem. Logo o conjunto é
+não vazio e $R^{\mathrm{glob}}_n \leq R_T(L_n)$.
+
+($\geq$) Se $R_T(L_n) = 0$, o argumento acima vale para $c = 0$ e o
+mínimo é $0$. Se $r := R_T(L_n) \geq 1$, então
+$r \in \mathcal{C}_T(L_n)$ (o máximo de \eqref{eq:R} pertence ao
+conjunto) e, pela \cref{cor:suporte-dinamico},
+$\mathrm{D}_n(r-1, r) > 0$, isto é, $g_T^{[r-1]} \neq g_T^{[r]}$: o
+candidato $c = r-1$ não pertence ao conjunto. Para $c < r-1$ vale
+$(c, r] \supseteq (r-1, r] \ni r$, logo de novo
+$\mathrm{D}_n(c, r) > 0$ e $c$ não pertence. Como $r$ pertence (par
+($\leq$)), o mínimo é $r$.
+\end{proof}
+
+\begin{theorem}[Número exato de regimes]\label{thm:regimes}
+Para todo $n \geq 1$:
+\begin{equation}\label{eq:regimes}
+  |\mathcal{G}_n| \;=\; \bigl|\mathcal{C}_T(L_n) \setminus \{0\}\bigr| + 1
+  \;=\; |\mathcal{C}_T(L_n)| + 1 - \mathbf{1}_{\,0 \in \mathcal{C}_T(L_n)} .
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Fixe o vetor $V(c) := (J_{T,\Phi}(c))_{\Phi \in \mathfrak{F}_n}$. Pela
+\cref{def:gen}, a saída de $g_T^{[c]}$ em $u$ depende de $c$ apenas
+por $V(c)$; e $V(c) \neq V(c')$ implica $g_T^{[c]} \neq g_T^{[c']}$
+como funções: para algum $\Phi$ vale $J_{T,\Phi}(c) \neq
+J_{T,\Phi}(c')$, e qualquer $u \in U_n(\Phi)$ (não vazio pela
+\cref{lem:cilindros-n}) produz saídas distintas pela injetividade de
+$\Out_u$ (\cref{lem:outinj}). Logo, em $\{0,1\}^n$,
+$g_T^{[c]} = g_T^{[c']}$ $\iff$ $V(c) = V(c')$.
+
+Cada coordenada de $V$ é não decrescente (\cref{lem:monotonicidade}),
+logo, se $V(r) \neq V(r-1)$, alguma coordenada subiu e jamais retorna:
+$V(c) \neq V(r)$ para todo $c < r$ --- os regimes não se repetem. Pela
+\cref{cor:suporte-dinamico} (na versão $g^{[r-1]} \neq g^{[r]}$
+$\iff$ $\mathrm{D}_n(r-1,r) > 0$), a mudança ocorre em $r \geq 1$
+$\iff$ $r \in \mathcal{C}_T(L_n)$, e $V$ é constante em todo o resto
+(em particular para $c \geq R_T(L_n)$, pela
+\cref{thm:estab-global}). Assim os regimes são exatamente $\{V(0)\}$
+mais $\{V(r) : r \in \mathcal{C}_T(L_n),\ r \geq 1\}$, todos
+distintos. (A transição em $r = 0$, quando existe, não cria regime:
+não há orçamento $-1$ --- daí o termo indicador.)
+\end{proof}
+
+\begin{remark}[Trajetória e leitura probabilística]\label{rem:trajetoria}
+A variação espectral $V_{T,n}(m) := \sum_{r=1}^{m} \lambda_{T,n}(r)
+= \sum_{\Phi \in \mathfrak{F}_n} 2^{-|\Phi|}\,
+|\mathcal{B}_T(\Phi) \cap [1,m]|$ é, por \eqref{eq:intensidade},
+$\sum_{r=1}^{m} \mathrm{D}_n(r-1,r)$, e satisfaz
+$\mathrm{D}_n(0,m) \leq V_{T,n}(m)$ pela desigualdade triangular da
+distância de Hamming, com igualdade se, e somente se, nenhuma entrada
+muda de saída mais de uma vez no percurso $0 \to \cdots \to m$ --- é
+o número esperado (ponderado pela massa do cilindro) de transições de
+uma entrada uniforme. Se $U$ é uniforme em $\{0,1\}^n$, então
+$\Pr[\Fm_n(U)$ definida e $\mathcal{B}_T(\Fm_n(U)) \cap I \neq
+\emptyset] = \Gamma_{T,n}(I)$, e a contagem esperada de transições em
+$I$ é $\sum_{r \in I} \lambda_{T,n}(r)$; daí
+$\Gamma_{T,n}(I) \leq \sum_{r \in I} \lambda_{T,n}(r) \leq
+k\,\Gamma_{T,n}(I)$ se cada fórmula tem no máximo $k$ transições em
+$I$. Concentração de transições e cobertura de entradas são, portanto,
+invariantes distintos, formalmente separados.
+\end{remark}
+
+\begin{remark}[Perfil de estabilização]\label{rem:perfil-global}
+Com $H_T(L,c) := \sum_{|\Phi| \leq L} 2^{-|\Phi|}\,
+\mathbf{1}_{\,\rho_T(\Phi) > c}$ (igual a $\sum_{\Phi \in
+\mathfrak{F}_n}$ para $L = L_n$, pela \cref{lem:cilindros-n}(i)), a
+\eqref{eq:cobertura} com $c^* \geq R_T(L_n)$ dá
+$\mathrm{D}_n(c, c^*) = H_T(L_n, c)$: de fato,
+$\mathcal{B}_T(\Phi) \cap (c, c^*] \neq \emptyset$ $\iff$
+$\rho_T(\Phi) > c$, pois $\rho_T(\Phi) = \max \mathcal{B}_T(\Phi) \leq
+R_T(L_n) \leq c^*$. Assim $H_T(L_n, c)$ é a fração de entradas ainda
+fora do regime estacionário no orçamento $c$: função não crescente,
+nula para $c \geq R_T(L_n)$, cuja queda $H_T(L,c-1) - H_T(L,c)$ é a
+massa de fórmulas com $\rho_T(\Phi) = c$ --- a função de sobrevivência
+da distribuição ponderada dos limiares finais.
+\end{remark}
+
+\begin{remark}[Leis assintóticas de $\Gamma$: o enunciado (Q-Asy) e o que já fecha]\label{rem:assintoticos}
+Para janelas $I_L$ crescentes, classificar $\liminf_L \Gamma_T(L;I_L)$
+e $\limsup_L \Gamma_T(L;I_L)$, com
+\begin{equation}\label{eq:gamma}
+  \Gamma_T(L;I) := \sum_{|\Phi| \leq L} 2^{-|\Phi|}\,
+  \mathbf{1}_{\,\mathcal{B}_T(\Phi) \cap I \neq \emptyset}
+\end{equation}
+(soma sobre $\Phi$ admissíveis; $0 \leq \Gamma \leq 1$
+por Kraft, código livre de prefixo --- \cref{lem:cilindros-n}(iii)).
+No caso operacional $L = L_n$ e $I = (b_1(n), b_2(n)]$ temos
+$\Gamma_T(L_n; I) = \Gamma_{T,n}(I) = \mathrm{D}_n(b_1,b_2)$
+(\cref{lem:cilindros-n}(i) e \eqref{eq:cobertura}). Três regimes
+candidatos, como nos registros de trabalho: $\to 0$ (o espectro
+existe, mas sua influência estatística desaparece), $\limsup > 0$
+(fração não desprezível de entradas sensível ao orçamento) e
+\emph{crescimento controlado}. Fixados os predicados
+$\mathrm{P1}$: $\Gamma_T(L;I_L) > 0$ em infinitos $L$; $\mathrm{P2}$:
+$\limsup_L \Gamma_T(L;I_L) > 0$; $\mathrm{P3}$: $\liminf_L
+\Gamma_T(L;I_L) > 0$ --- vale $\mathrm{P3} \Rightarrow \mathrm{P2}
+\Rightarrow \mathrm{P1}$, e as conversas \emph{não} são teorema. O que
+já se prova:
+\begin{enumerate}
+\item[(a)] \emph{Janela fixa}: monotonia e Kraft dão convergência, e o
+  limite é $> 0$ se, e somente se, algum $\Phi$ admissível tem
+  $\mathcal{B}_T(\Phi) \cap I \neq \emptyset$;
+\item[(b)] \emph{Janelas ninhadas} ($I_L \subseteq I_{L'}$ para $L
+  \leq L'$): os indicadores só ligam, logo $\Gamma_T(L;I_L)$ é não
+  decrescente e converge; o limite é $0$ se, e somente se,
+  $\Gamma_T(L;I_L) \equiv 0$, isto é, nenhum $\Phi$ cruza
+  $\bigcup_L I_L$ --- os regimes colapsam;
+\item[(c)] \emph{Janela saturante} ($I_L \supseteq \mathcal{C}_T(L)$
+  para $L$ grande) com $\mathcal{B}_T(\Phi) \neq \emptyset$ para toda
+  $\Phi$ admissível de tamanho $\leq L$ e $q(\Phi) \geq 2$ (condição
+  garantida sob \cref{hyp:P4p}, pelo argumento da \cref{lem:massa}):
+  então $\mathcal{B}_T(\Phi) \subseteq \mathcal{C}_T(L) \subseteq I_L$
+  e todo indicador vale $1$, donde
+  $\Gamma_T(L;I_L) = \kappa_T(L) := \sum_{|\Phi| \leq L}
+  2^{-|\Phi|} \to \kappa_T \in (0,1]$ --- para esta classe o regime
+  $\to 0$ é refutado (Nível C, condicionado);
+\item[(d)] \emph{Positividade exata}, sem qualquer alinhamento:
+  $\Gamma_T(L;I) > 0 \iff \mathcal{C}_T(L) \cap I \neq \emptyset$
+  (sentido $\Rightarrow$: soma de termos $\geq 0$ positiva $\Rightarrow$
+  algum indicador $1$; $\Leftarrow$: um $r \in \mathcal{C}_T(L) \cap I$
+  pertence a alguma $\mathcal{B}_T(\Phi)$ com $|\Phi| \leq L$);
+\item[(e)] \emph{Janelas}: em escala logarítmica a janela de
+  \eqref{eq:atividade} é a verdadeira (\cref{cor:escala-log}), e fora
+  dessa escala valem a advertência e o exemplo da
+  \cref{cor:atividade-var}: ``$A_T > 0$'' transportado e ``$\Gamma >
+  0$'' na janela verdadeira são predicados \emph{distintos}.
+\end{enumerate}
+Resta (Q-Asy): fixada uma classe \emph{rica} de famílias ---
+não ninhada (senão (b)), não saturante (senão (c)), com $I_L \neq
+\emptyset$ e largura $w_L$ controlada ---, classificar
+$\liminf/\limsup$ sobre essa classe e buscar condições sobre $T$ e
+$I_L$ que separem $\mathrm{P1}$, $\mathrm{P2}$ e $\mathrm{P3}$, e
+formular leis de sensibilidade. Duas advertências: (i)~a conjectura
+registrada, $\Gamma_T(L;I_L) \geq \varepsilon > 0$ em infinitos $L$,
+tem a família \emph{fixada} (\texttt{06\_GEOMETRIA\_CT} §9.6.6):
+$I_L := (L,\,L+w]$, inteiro fixo $w \geq 1$ --- isto é, os regimes
+$b_1(n) = \lfloor\log n\rfloor$ e $b_2(n) = \lfloor\log n\rfloor + w$
+(escala log, logo transportada $=$ verdadeira,
+\cref{cor:escala-log}); não ninhada (logo (b) não colapsa) e, sob
+(\ref{hyp:P4p}), não saturante para $L$ grande (logo (c) não a
+decide);
+(ii)~o regime ``crescimento controlado'' é \emph{vazio} para
+$\Gamma$ (Kraft: $\Gamma \leq 1$ sempre), logo leis de sensibilidade
+só se formulam sobre as versões contadas $A_T$, $\widetilde{A}_T$ e
+$Z_L$. Pela \cref{lem:barreira}, simulação só reporta $\Gamma \geq$
+cota com testemunho --- nunca $\Gamma = 0$. Nenhuma lei é afirmada:
+questão aberta (níveis C/D).
+\end{remark}
+
+\begin{remark}[Redução ao desacordo --- obrigação condicionada]\label{rem:disagree}
+Seja $\operatorname{DISAGREE}_{b_1,b_2} := \{u \in \{0,1\}^* :
+g_T^{[b_1]}(u) \neq g_T^{[b_2]}(u)\}$. Se o gadget da
+\cref{sec:gadget} produzir, para um problema $A$, instâncias
+$\theta \mapsto u_\theta$ com $\theta \in A \iff u_\theta \in
+\operatorname{DISAGREE}_{b_1,b_2}$ (leitura intervalar de
+\eqref{eq:71b}), então $A \leq_m \operatorname{DISAGREE}_{b_1,b_2}$
+por redução $m$-trivial. Duas condições são visíveis e \emph{nenhuma}
+é estabelecida aqui: (i)~a equivalência
+$\theta \in A \iff \mathcal{B}_T(\Phi_\theta) \cap I_\theta \neq
+\emptyset$ depende das obrigações da \cref{sec:gadget}
+(\cref{hyp:P4p,hyp:P7a}); (ii)~sob o custo polinomial de
+$g_T^{[b]}$ para $b(n) = O(\log n)$ (Etapa 2,
+\texttt{01\_ambiente} §5.4), $\operatorname{DISAGREE}$ é decidível em
+tempo polinomial --- logo $A$ não pode ser NP-completo, a não ser que
+$P = NP$. O alvo legítimo é uma propriedade de \emph{proof
+complexity} (dureza, disjunção, range), não NP-dureza clássica.
+\end{remark}
+
+\begin{remark}[O que permanece aberto]\label{rem:abertas-global}
+(i)~\emph{Range}: diferença de saídas não dá diferença de imagens
+(advertência após \cref{cor:diferenca-infinita}); o alvo é um
+\emph{certificado de exclusividade} --- $y = g_T^{[r-1]}(u)$ com
+$\forall v\, g_T^{[r]}(v) \neq y$, donde $y \in
+\operatorname{rng}(g_T^{[r-1]}) \setminus \operatorname{rng}(g_T^{[r]})$
+---, que daria a ponte transição $\to$ separação de range (Etapa 13);
+aberto. (ii)~\emph{Suficiência de $R_T$}: a identidade
+\eqref{eq:cobertura} não depende do envelope, mas há pares com o mesmo
+$R_T(L)$ e $\lambda/\Gamma$ distintos (esquematicamente
+$C_1 = \{R\}$ versus $C_2 = \{1,\dots,R\}$)? A realizabilidade de
+tais pares como $\mathcal{C}_T$ de teorias concretas é a pergunta Q1
+(Etapa 10) --- aberta. (iii)~\emph{$\tau$/hardness}: as proibições
+(P-4) de \texttt{06} §9.3 permanecem integralmente, inclusive
+diferença de \emph{imagens} e hierarquia de orçamentos. (iv)~versão
+$\Sigma^b_1$ e transferência: obrigações da \cref{sec:gadget},
+condicionadas a \cref{hyp:P4p,hyp:P7a}.
+\end{remark}
+
+% ============================================================================
+% Seção OBRIGATÓRIA (03_PRONTOS item 13): comparação direta com a literatura.
+% ============================================================================
+\section{Compara\c{c}\~{a}o com a literatura}\label{sec:comparacao}
+
+\paragraph{Gödel (1936).}
+O speed-up de Gödel \cite{Godel1936} estabelece que, para sistemas adequados,
+não existe majorante computável para os comprimentos mínimos de prova ao longo
+de famílias de teoremas. Nossos teoremas da \cref{sec:nucleo} são de natureza
+diferente: são \emph{locais} (fórmula fixa), \emph{sintáticos} (valem para $T$
+inconsistente) e elementares. A lei condicionada $R_T$ sem majorante computável
+(Nível C) tem exatamente o conteúdo clássico do speed-up, aplicado a
+$\rho_T(\Phi)$ — e por isso \emph{não} é reivindicada como nova; o que se
+reivindica como possível contribuição original é o \emph{objeto}
+$\mathcal{C}_T(L)$ e sua geometria, não o fenômeno do não-majorante.
+
+\paragraph{Parikh (1973) e Buss (1994, 1999).}
+Parikh \cite{Parikh1973} estudou limites para comprimentos de prova em
+fragmentos da aritmética; as formulações precisas e a relação com aritmética
+limitada estão em \cite{Buss1994,Buss1999}. Nosso $\rho_T(\Phi)$ é uma
+grandeza \emph{definicional} e por-fórmula: o menor orçamento a partir do qual o
+seletor estabiliza. Não há alegação de recuperação dos limites de Parikh a
+partir de $\rho_T$; a comparação relevante é que ambos medem ``quanto orçamento
+de prova a fórmula exige'', em escalas (família de sentenças versus uma sentença)
+e finalidades (limite complexitário versus estabilização de um algoritmo)
+diferentes.
+
+\paragraph{Pudlák (1986, 1998).}
+O levantamento \cite{Pudlak1998} é a referência padrão para comprimentos de
+prova; \cite{Pudlak1986} trata dos limites para declarações de consistência
+finita. Citação obrigatória de qualquer trabalho nesta área: a posição do
+espectro é auxiliar aos fenômenos de speed-up, não substitutiva —
+$R_T(L)$ herda deles o conteúdo de grau, enquanto a pergunta aberta é
+geométrica (como $\mathcal{C}_T(L)$ se distribui).
+
+\paragraph{Kraj\'{\i}\v{c}ek (2023--2025).}
+A parametrização do orçamento $\log n \to b(n)$ e os geradores
+$g_T^{[b]}$/\,$g_T$ são de \cite{Krajicek2025,Krajicek2025generators}; o
+problema aberto sobre $\operatorname{rng}(g_T)$ está em
+\cite{Krajicek2023ECCC}. Nossa posição: (i)~a busca bibliográfica encerrada em
+27/09/2026 não encontrou o objeto espectral $\Phi \mapsto \rho_T(\Phi)
+\mapsto \mathcal{C}_T(L)$ isolado na literatura (inclusive no livro
+\cite{Krajicek2025generators}, varredura completa); (ii)~não reivindicamos
+novidade para $b(n)$; (iii)~o gadget de transferência (Nível C) é o ponto onde
+a linha se conecta a \cite{Krajicek2025} — ainda condicionado às obrigações da
+\cref{sec:gadget}.
+
+\section{Conclus\~{a}o e trabalho futuro}\label{sec:conclusao}
+
+Fixamos um ambiente formal autocontido (Nível A) e provamos, na forma exata, os
+teoremas locais do espectro de limiares de prova (Nível B), com certificado de
+enumeração exaustiva. O limiar $\rho_T(\Phi)$ é \emph{o} orçamento de
+estabilização do seletor, e os corolários traduzem a estabilização para a
+comparação explícita entre dois orçamentos via $\Out$. Dotamos
+$\mathcal{C}_T(L)$ de geometria --- contagem, lacunas, multiplicidade, medida
+e barreira de computabilidade (\cref{sec:geometria}) --- e provamos a
+consequência global do espectro sobre o gerador: a identidade de cobertura
+(\cref{thm:cobertura}), a caracterização dinâmica de $\mathcal{C}_T$
+(\cref{cor:suporte-dinamico}), a estabilização global exata
+(\cref{thm:estab-global}) e o número exato de regimes (\cref{thm:regimes}):
+$\mathcal{C}_T(L)$ é o suporte exato da derivada discreta da família de
+geradores em relação ao orçamento.
+
+Trabalho futuro, em ordem de prioridade: (1)~Etapas 10--11: modelos
+concretos para a separação de invariantes (P-1) e as leis assintóticas de
+$\Gamma_T$ (\cref{rem:assintoticos}; P-2); (2)~certificado de exclusividade
+de saída --- ponte para $\operatorname{rng}(g_T^{[b]})$ (Etapa 13;
+\cref{rem:abertas-global}); (3)~a pergunta Q1: existem espectros com o mesmo
+$R_T(L)$ e distintos $\lambda/\Gamma$, realizáveis em teorias concretas? ---
+com a consequência de enriquecer o objeto para
+$\mathfrak{S}_T$; (4)~gadget: equivalência de intervalo e versão
+$\Sigma^b_1$ (\cref{sec:gadget}, ainda condicionada a
+\cref{hyp:P4p,hyp:P7a}); (5)~a conexão quantitativa com
+$\tau(g_T^{[b]})$ (Etapa 14) e, separadamente, a incorporação do custo
+polinomial de $g_T^{[b]}$ para $b(n) = O(\log n)$ (Etapa 2, já fechada em
+\texttt{01\_ambiente} §5.4). Cada item acima é anunciado com seu nível
+editorial e nenhum deles é citado aqui como resultado fechado.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

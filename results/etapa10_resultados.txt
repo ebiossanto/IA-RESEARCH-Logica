@@ -1,0 +1,104 @@
+=== ETAPA 10 — resultados (gerado por src/julia/etapa10_modelos.jl) ===
+Execução: 2026-09-27 19:44:30 | Julia 1.13.1
+Comando: julia src/julia/etapa10_modelos.jl | determinístico (seed 20260927)
+
+[DADO] Modelo CadeiaL — perfil a=[1, 1, 1, 2], 5 fórmulas; cadeia aritmética R_T(L)=L; Φ₄a/Φ₄b compartilham o limiar 4 (m(4)=2)
+[DADO]   L=1: C={1} R=1 N=1 Δ=0 Z=1
+[DADO]   L=2: C={1,2} R=2 N=2 Δ=1 Z=2
+[DADO]   L=3: C={1,2,3} R=3 N=3 Δ=1 Z=3
+[DADO]   L=4: C={1,2,3,4} R=4 N=4 Δ=1 Z=5
+[DADO]   λ(0..4) em L=4: 0.0, 0.5, 0.25, 0.125, 0.125
+[DADO]   objetos: 5 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤7, orçamentos c≤6
+
+[DADO] Modelo CadeiaL2 — perfil a=[1, 1, 1, 2], 5 fórmulas; cadeia R_T(L)=1,4,9,16 (≍ L²); multiplicidade m(16)=2; Δ(4)=4
+[DADO]   L=1: C={1} R=1 N=1 Δ=0 Z=1
+[DADO]   L=2: C={1,4} R=4 N=2 Δ=3 Z=2
+[DADO]   L=3: C={1,4,6,9} R=9 N=4 Δ=3 Z=4
+[DADO]   L=4: C={1,4,6,9,12,16} R=16 N=6 Δ=4 Z=7
+[DADO]   λ(0..16) em L=4: 0.0, 0.5, 0.0, 0.0, 0.25, 0.0, 0.125, 0.0, 0.0, 0.125, 0.0, 0.0, 0.0625, 0.0, 0.0, 0.0, 0.125
+[DADO]   objetos: 5 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤19, orçamentos c≤18
+
+[DADO] Modelo CadeiaExp — perfil a=[1, 1, 1, 2], 5 fórmulas; cadeia R_T(L)=2,4,8,16 (≍ 2^L); multiplicidade m(16)=2
+[DADO]   L=1: C={2} R=2 N=1 Δ=0 Z=1
+[DADO]   L=2: C={2,4} R=4 N=2 Δ=2 Z=2
+[DADO]   L=3: C={2,4,8} R=8 N=3 Δ=4 Z=3
+[DADO]   L=4: C={2,4,8,16} R=16 N=4 Δ=8 Z=5
+[DADO]   λ(0..16) em L=4: 0.0, 0.0, 0.5, 0.0, 0.25, 0.0, 0.0, 0.0, 0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.125
+[DADO]   objetos: 5 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤19, orçamentos c≤18
+
+[DADO] Modelo Derivacao — perfil a=[1, 1, 1, 2], 5 fórmulas; átalho/speed-up: ρ(Φ₃)=12 > ρ(Φ₄a)=2, ρ(Φ₄b)=4 (fórmula maior estabiliza antes); R_T=1,3,12,12
+[DADO]   L=1: C={1} R=1 N=1 Δ=0 Z=1
+[DADO]   L=2: C={1,3} R=3 N=2 Δ=2 Z=2
+[DADO]   L=3: C={1,3,5,12} R=12 N=4 Δ=7 Z=4
+[DADO]   L=4: C={1,2,3,4,5,12} R=12 N=6 Δ=7 Z=7
+[DADO]   λ(0..12) em L=4: 0.0, 0.5, 0.125, 0.25, 0.0625, 0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.125
+[DADO]   objetos: 5 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤15, orçamentos c≤14
+
+[DADO] Modelo Env1 — perfil a=[1, 1, 1, 1], 4 fórmulas; C₁: C_T(L)={8} para todo L; envoltória R_T(L)=8 constante; N=1
+[DADO]   L=1: C={8} R=8 N=1 Δ=0 Z=1
+[DADO]   L=2: C={8} R=8 N=1 Δ=0 Z=2
+[DADO]   L=3: C={8} R=8 N=1 Δ=0 Z=3
+[DADO]   L=4: C={8} R=8 N=1 Δ=0 Z=4
+[DADO]   λ(0..8) em L=4: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9375
+[DADO]   objetos: 4 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤11, orçamentos c≤10
+
+[DADO] Modelo Env2 — perfil a=[1, 1, 1, 1], 4 fórmulas; C₂: mesma envoltória R_T(L)=8; C_T(4)={1,...,8}; N(4)=8 — geometria oposta a Env1
+[DADO]   L=1: C={8} R=8 N=1 Δ=0 Z=1
+[DADO]   L=2: C={7,8} R=8 N=2 Δ=1 Z=2
+[DADO]   L=3: C={5,7,8} R=8 N=3 Δ=2 Z=3
+[DADO]   L=4: C={1,2,3,4,5,6,7,8} R=8 N=8 Δ=1 Z=8
+[DADO]   λ(0..8) em L=4: 0.0, 0.0625, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.25, 0.5
+[DADO]   objetos: 4 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤11, orçamentos c≤10
+
+[DADO] Modelo Bordas — perfil a=[1, 1, 1, 2], 5 fórmulas; bordas de 02 §2: j*=0 (B=∅), ρ=0 com 0∈C_T, ℓ não-monótono, j*=k; ATENÇÃO: viola (P4′) no Φ de tamanho 1
+[DADO]   L=1: C={} R=-1 N=0 Δ=0 Z=0
+[DADO]   L=2: C={0} R=0 N=1 Δ=0 Z=1
+[DADO]   L=3: C={0,2,9} R=9 N=3 Δ=7 Z=3
+[DADO]   L=4: C={0,2,5,7,9} R=9 N=5 Δ=3 Z=6
+[DADO]   λ(0..9) em L=4: 0.25, 0.0, 0.125, 0.0, 0.0, 0.125, 0.0, 0.0625, 0.0, 0.125
+[DADO]   objetos: 5 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤12, orçamentos c≤11
+
+[DADO] Modelo Aleatorio — perfil a=[1, 1, 1, 2], 5 fórmulas; ℓ aleatórios (j* ~ U{0..k}, valores ~ U{0..20}); estresse cego da bateria; seed=20260927
+[DADO]   L=1: C={7} R=7 N=1 Δ=0 Z=1
+[DADO]   L=2: C={7,11} R=11 N=2 Δ=4 Z=2
+[DADO]   L=3: C={7,11} R=11 N=2 Δ=4 Z=2
+[DADO]   L=4: C={7,8,11,14,15,16,20} R=20 N=7 Δ=4 Z=8
+[DADO]   λ(0..20) em L=4: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0625, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0625, 0.125, 0.0625, 0.0, 0.0, 0.0, 0.0625
+[DADO]   objetos: 5 fórmulas; por n∈{4,8,16}: 2^n entradas, 8 pares de orçamento, limiares r≤23, orçamentos c≤22
+
+[DADO]   indicador (0 ∈ C_T) em Bordas n=4: |𝒢|=1 = |C∖{0}|+1=1; a versão NÃO corrigida |𝒢|=|C|+1=2 seria REFUTADA aqui
+[DADO]   indicador (0 ∈ C_T) em Bordas n=8: |𝒢|=3 = |C∖{0}|+1=3; a versão NÃO corrigida |𝒢|=|C|+1=4 seria REFUTADA aqui
+[DADO]   indicador (0 ∈ C_T) em Bordas n=16: |𝒢|=5 = |C∖{0}|+1=5; a versão NÃO corrigida |𝒢|=|C|+1=6 seria REFUTADA aqui
+[DADO] ATAQUE P-1 (par de envelope): Env1 vs Env2 — R_T(L)=8 para ambos (L=1..4); N(4): 1 vs 8; Δ(4): 0 vs 1
+[DADO] ATAQUE Q1 (mesmo R_T, distinta atividade): λ(0..8) Env1=0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.9375 | Env2=0.0,0.0625,0.0625,0.0625,0.0625,0.125,0.0625,0.25,0.5; D₁₆(0,3)=0.0 vs 0.0625
+
+[TEOREMA] bateria de falsificação (cada critério em CRIT):
+[TEOREMA]   PASS T0a-prefixo 144/144 — refuta se: existe par de códigos em que um é prefixo do outro (código inválido)
+[TEOREMA]   PASS T0b-kraft 24/24 — refuta se: Σ_{Φ∈F_n} 2^{-|Φ|} > 1 (violação de Kraft) — refuta lem:cilindros-n(iii)
+[TEOREMA]   PASS T10-perfil 297/297 — refuta se: D_n(c,c*) ≠ H_T(L_n,c) com c* ≥ R_T — refuta rem:perfil-global
+[TEOREMA]   PASS T11-env 5/5 — refuta se: par Env1/Env2: R_T(L) difere — o par não serve como ataque P-1
+[TEOREMA]   PASS T12-D03 1/1 — refuta se: par Env1/Env2: D_n(0,3) idêntico — ataque Q1 falha
+[TEOREMA]   PASS T12-lambda 1/1 — refuta se: par Env1/Env2: mesmo R_T mas vetores λ idênticos — ataque Q1 falha
+[TEOREMA]   PASS T13-ativ 24/24 — refuta se: D_n(2,9) < A_T(L_n;2,9)/((9-2)·2^{L_n}) — refuta limite inferior de cor:atividade
+[TEOREMA]   PASS T13-pos 24/24 — refuta se: A_T(L_n;2,9) > 0 ≠⟺ D_n(2,9) > 0 — refuta cor:atividade
+[TEOREMA]   PASS T1a-Fn 24/24 — refuta se: F_enum(u) ≠ {Φ : |Φ| ≤ ⌊log n⌋} — refuta lem:cilindros-n(i)
+[TEOREMA]   PASS T1b-U 78/78 — refuta se: |U_n(Φ)| ≠ 2^{n-|Φ|} — refuta lem:cilindros-n(ii)
+[TEOREMA]   PASS T2-cobertura 192/192 — refuta se: D_n(b₁,b₂) ≠ Γ((b₁(n),b₂(n)]) — refuta thm:cobertura
+[TEOREMA]   PASS T2s-strings 192/192 — refuta se: diff por J (def:gen) difere de diff por strings (Out) na amostra — refuta eq:71b/lem:outinj
+[TEOREMA]   PASS T3-intensidade 273/273 — refuta se: D_n(r-1,r) ≠ λ(r) para r ≥ 1 — refuta cor:intensidade
+[TEOREMA]   PASS T4-suporte 273/273 — refuta se: r ∈ C_T(L_n) XOR D_n(r-1,r) > 0 — refuta cor:suporte-dinamico
+[TEOREMA]   PASS T5-estab 24/24 — refuta se: R^glob_n ≠ R_T(L_n) — refuta thm:estab-global
+[TEOREMA]   PASS T6-equiv 1676/1676 — refuta se: g^c = g^{c'} ≠⟺ V(c) = V(c') — refuta o passo vetorial de thm:regimes
+[TEOREMA]   PASS T6-regimes 24/24 — refuta se: |𝒢_n| ≠ |C_T(L_n)∖{0}|+1 — refuta thm:regimes (corrigido)
+[TEOREMA]   PASS T7-conv 32/32 — refuta se: convenção D-geo-1 violada (Δ ≠ 0 para m ≤ 1)
+[TEOREMA]   PASS T7-sandbox 32/32 — refuta se: limite de prop:limites violado (N > 2^{2L+2}, Δ > R_T, A > N, K > min(2^{|Φ|+1},ρ+1))
+[TEOREMA]   PASS T8-Atilde 32/32 — refuta se: A_T > Ã_T > Z — refuta lem:atividade(ii)
+[TEOREMA]   PASS T8-DT 31/31 — refuta se: D_T(L,R) ≠ A_T(L,R)/(R+1) — refuta lem:identidades
+[TEOREMA]   PASS T8-NZ 32/32 — refuta se: N_T > Z_T — refuta lem:mult-suporte
+[TEOREMA]   PASS T8-supp 32/32 — refuta se: supp(μ_{T,L}) ≠ C_T(L) — refuta lem:mult-suporte
+[TEOREMA]   PASS T8-telesc 24/24 — refuta se: A_T(L;b₁,b₂) ≠ A_T(L,B_{b₂}) - A_T(L,B_{b₁}) — refuta lem:identidades
+[TEOREMA]   PASS T9-traj 273/273 — refuta se: D_n(0,m) > Σ_{r=1}^m D_n(r-1,r) — refuta rem:trajetoria (triangular)
+
+[TEOREMA] buscas truncadas: NENHUMA — os comprimentos ℓ são dados pelo modelo
+[TEOREMA] (limite, ĵ, Φ) não se aplica (sem busca de provas); limite de enumeração: n ≤ 16, L ≤ 4, k_Φ ≤ 32, c ≤ Rmax+2.
+=== fim ===

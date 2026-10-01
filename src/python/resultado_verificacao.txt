@@ -1,0 +1,10 @@
+﻿======================================================================
+Verificacao exaustiva do espectro de limiares de prova
+======================================================================
+perfis enumerados          : 410155
+pares (c1,c2) testados     : 7737331
+escadas testadas (REAL)    : 57
+maior salto unitario de J  : 8
+exemplo (2,10,7,inf)       : B_T=[2, 10], rho=10, j*=3, J(9)=1, J(10)=3
+----------------------------------------------------------------------
+TODOS OS TESTES PASSARAM (T5.1a/b, L6.1, T6.2, T6.3, T4.1, REAL, EXEMP)

@@ -1,0 +1,23 @@
+# Artefatos de compilação LaTeX (o main.pdf é versionado)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.toc
+paper/*.synctex.gz
+paper/*.fls
+paper/*.fdb_latexmk
+
+# Estado interno do harness (metadados de sessão — não é conteúdo de pesquisa)
+delta-h.json
+
+# PDF de terceiros usado na auditoria (não redistribuir)
+docs/k4.pdf
+
+# Sistema / caches
+Thumbs.db
+desktop.ini
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

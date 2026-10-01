@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "Se você usar este repositório em trabalho acadêmico ou técnico, cite-o como indicado abaixo."
+title: "IA RESEARCH — Lógica: Incompletude, Falha de Colagem e Espectro de Limiares de Prova"
+type: software
+authors:
+  - family-names: Soares
+    given-names: Euzébio
+date-released: 2026-10-01
+url: "https://github.com/ebiossanto/IA-RESEARCH-Lógica"
+abstract: >-
+  Repositório de pesquisa sobre (i) a impossibilidade de uma teoria certificar
+  globalmente suas próprias verificações locais (falha de colagem / perspectiva
+  externa) e (ii) o espectro de limiares de prova dos geradores de Krajíček
+  (ρ_T, B_T, C_T, R_T, g_T^[b], gadget θ ↦ Φ_θ). Contém cadeias formais em
+  proofs/, documentação de linha em docs/, verificações exaustivas em src/ e o
+  artigo em paper/.
+keywords:
+  - lógica matemática
+  - incompletude
+  - custo de prova
+  - espectro de limiares de prova
+  - Krajíček
+  - Gödel
+  - falha de colagem
+  - geradores limitados
